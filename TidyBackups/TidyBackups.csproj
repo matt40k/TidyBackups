@@ -21,7 +21,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
-    <DocumentationFile>tidybackups.xml</DocumentationFile>
+    <DocumentationFile>
+    </DocumentationFile>
     <NoStdLib>false</NoStdLib>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
@@ -38,8 +39,9 @@
   <PropertyGroup />
   <PropertyGroup />
   <PropertyGroup>
-    <StartupObject>TidyBackups.UserInferface</StartupObject>
+    <StartupObject>TidyBackups.UserInterface</StartupObject>
   </PropertyGroup>
+  <PropertyGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Compile Include="Days.cs" />
@@ -55,7 +57,7 @@
     <Compile Include="ToInt.cs" />
     <Compile Include="Validation.cs" />
     <Compile Include="Work.cs" />
-    <Compile Include="UserInferface.cs" />
+    <Compile Include="UserInterface.cs" />
     <Compile Include="Compress.cs" />
     <Compile Include="Exit.cs" />
     <Compile Include="Message.cs" />

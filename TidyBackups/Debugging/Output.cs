@@ -26,12 +26,12 @@ namespace TidyBackups.Debug
         internal static void Info(string[] args, bool compress, int days, string path, int preserve, bool safe)
         {
             Message.Print(Assembly.Title + " - " + Assembly.Version);
-            Message.Print("Admin: " + (object)(bool)(Admin.IsAdmin ? 1 : 0));
+            Message.Print("Admin: " + Admin.IsAdmin);
             Message.Print("OS Version: " + Os.Version);
             Message.Print("Disc letter: " + Disc.GetDriveName(path));
             Message.Print("Disc label: " + Disc.Label(path));
             Message.Print("Disc format: " + Disc.Format(path));
-            Message.Print("Local disc: " + (object)(bool)(Disc.IsLocalDrive(Disc.GetDriveName(path)) ? 1 : 0));
+            Message.Print("Local disc: " + Disc.IsLocalDrive(Disc.GetDriveName(path)));
             Message.Print("Disc type: " + Disc.Type(path));
             Message.Print("Disc ready: " + Disc.Ready(path));
             Message.Print("Disc size: " + Disc.TotalSpace(path));
@@ -44,12 +44,12 @@ namespace TidyBackups.Debug
             Files.Filtered(path);
             Message.Print("Path permission: " + Permissions.View(path));
             Message.Print("Preserve: " + (object)preserve);
-            Message.Print("Safe: " + (object)(bool)(safe ? 1 : 0));
-            Message.Print("Archive: " + (object)(bool)(compress ? 1 : 0));
+            Message.Print("Safe: " + safe);
+            Message.Print("Archive: " + compress);
             bool flag = true;
             if (Message.Logfile == "")
                 flag = false;
-            Message.Print("Log: " + (object)(bool)(flag ? 1 : 0));
+            Message.Print("Log: " + flag);
             if (!flag)
                 return;
             Message.Print("Log path: " + Message.Logfile);

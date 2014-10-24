@@ -23,7 +23,7 @@ namespace TidyBackups
     /// <summary>
     /// Main entry class for application.
     /// </summary>
-    internal class UserInferface
+    internal class UserInterface
     {
         /// <summary>
         /// Main entry for application.
