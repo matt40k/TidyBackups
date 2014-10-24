@@ -43,8 +43,8 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Compile Include="Days.cs" />
-    <Compile Include="Debug\Files.cs" />
-    <Compile Include="Debug\Output.cs" />
+    <Compile Include="Debugging\Files.cs" />
+    <Compile Include="Debugging\Output.cs" />
     <Compile Include="Item\Permissions.cs" />
     <Compile Include="Filter.cs" />
     <Compile Include="Global.cs" />
@@ -103,9 +103,9 @@
     <Compile Include="Item\Stamp.cs" />
     <Compile Include="Item\Name.cs" />
     <Compile Include="Item\Disc.cs" />
-    <Compile Include="Debug\OS.cs" />
-    <Compile Include="Debug\Admin.cs" />
-    <Compile Include="Debug\Assembly.cs" />
+    <Compile Include="Debugging\OS.cs" />
+    <Compile Include="Debugging\Admin.cs" />
+    <Compile Include="Debugging\Assembly.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
