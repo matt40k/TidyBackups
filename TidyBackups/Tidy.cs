@@ -15,19 +15,16 @@
  * along with TidyBackups.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using System;
 using System.Collections;
 using TidyBackups.Item;
 
 namespace TidyBackups
 {
     /// <summary>
-    /// 
     /// </summary>
     internal class Tidy
     {
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="path"></param>
         /// <param name="maxage"></param>
@@ -35,7 +32,7 @@ namespace TidyBackups
         {
             foreach (string file in path)
             {
-                int TBfileAge = Days.Age(file);
+                var TBfileAge = Days.Age(file);
                 if (TBfileAge > maxage)
                 {
                     Rename.Delete(file);

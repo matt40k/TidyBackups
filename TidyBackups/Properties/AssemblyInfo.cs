@@ -35,6 +35,6 @@ using System.Runtime.InteropServices;
 //[assembly: AssemblyDelaySign(false)]
 //[assembly: AssemblyKeyFile("")]
 
-[assembly: AssemblyFileVersionAttribute("1.4.15.*")]
+[assembly: AssemblyFileVersion("1.4.15.*")]
 [assembly: ComVisible(false)]
 [assembly: NeutralResourcesLanguage("en-GB")]

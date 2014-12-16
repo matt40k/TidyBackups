@@ -22,26 +22,26 @@ using System.Security.Principal;
 namespace TidyBackups.Item
 {
     /// <summary>
-    /// Permission class
+    ///     Permission class
     /// </summary>
     internal class Permissions
     {
         /// <summary>
-        /// Displays the permissions of defined path
+        ///     Displays the permissions of defined path
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
         protected internal static string View(string path)
         {
-            string value = "";
-            DirectorySecurity folderSecurity = Directory.GetAccessControl(path);
+            var value = "";
+            var folderSecurity = Directory.GetAccessControl(path);
             foreach (
                 FileSystemAccessRule fileSystemAccessRule in
                     folderSecurity.GetAccessRules(true, true, typeof (NTAccount)))
             {
                 if (value != "Full Control")
                 {
-                    string userRights = fileSystemAccessRule.FileSystemRights.ToString();
+                    var userRights = fileSystemAccessRule.FileSystemRights.ToString();
                     // Message.print(userRights.ToUpper());   // DEBUG
                     switch (userRights.ToLower())
                     {

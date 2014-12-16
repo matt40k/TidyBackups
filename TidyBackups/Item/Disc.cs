@@ -22,12 +22,12 @@ using System.Management;
 namespace TidyBackups.Item
 {
     /// <summary>
-    /// Local disc
+    ///     Local disc
     /// </summary>
     internal class Disc
     {
         /// <summary>
-        /// Format of the drive
+        ///     Format of the drive
         /// </summary>
         /// <param name="file"></param>
         /// <returns></returns>
@@ -37,9 +37,8 @@ namespace TidyBackups.Item
             return drv.DriveFormat;
         }
 
-
         /// <summary>
-        /// Type of drive (Fixed, removable etc)
+        ///     Type of drive (Fixed, removable etc)
         /// </summary>
         /// <param name="file"></param>
         /// <returns></returns>
@@ -50,7 +49,7 @@ namespace TidyBackups.Item
         }
 
         /// <summary>
-        /// Label of the disc
+        ///     Label of the disc
         /// </summary>
         /// <param name="file"></param>
         /// <returns></returns>
@@ -61,7 +60,7 @@ namespace TidyBackups.Item
         }
 
         /// <summary>
-        /// Is the drive ready for use
+        ///     Is the drive ready for use
         /// </summary>
         /// <param name="file"></param>
         /// <returns></returns>
@@ -71,39 +70,38 @@ namespace TidyBackups.Item
             return drv.IsReady.ToString();
         }
 
-
         /// <summary>
-        /// Free disc space on disc (in MegaBytes)
+        ///     Free disc space on disc (in MegaBytes)
         /// </summary>
         /// <param name="file"></param>
         /// <returns></returns>
         protected internal static string FreeSpace(string file)
         {
             var drv = new DriveInfo(file);
-            long size = drv.AvailableFreeSpace/1024/1024;
+            var size = drv.AvailableFreeSpace/1024/1024;
             return size + " MB";
         }
 
         /// <summary>
-        /// Total disc space on disc (in MegaBytes)
+        ///     Total disc space on disc (in MegaBytes)
         /// </summary>
         /// <param name="file"></param>
         /// <returns></returns>
         protected internal static string TotalSpace(string file)
         {
             var drv = new DriveInfo(file);
-            long size = drv.TotalSize/1024/1024;
+            var size = drv.TotalSize/1024/1024;
             return size + " MB";
         }
 
         /// <summary>
-        /// Drive name
+        ///     Drive name
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
         protected internal static string GetDriveName(string fileName)
         {
-            int index = fileName.IndexOf(Path.VolumeSeparatorChar);
+            var index = fileName.IndexOf(Path.VolumeSeparatorChar);
             if (index > 0)
             {
                 return fileName.Substring(0, index + 1);
@@ -112,15 +110,15 @@ namespace TidyBackups.Item
         }
 
         /// <summary>
-        /// Is the drive locally attached (not a network drive)
+        ///     Is the drive locally attached (not a network drive)
         /// </summary>
         /// <param name="descriptor"></param>
         /// <returns></returns>
         protected internal static bool IsLocalDrive(string descriptor)
         {
-            string queryString = "SELECT * From Win32_LogicalDisk where name = '" + descriptor + "' and DriveType = 3";
-            DateTime now = DateTime.Now;
-            ManagementObjectCollection objects = new ManagementObjectSearcher(queryString).Get();
+            var queryString = "SELECT * From Win32_LogicalDisk where name = '" + descriptor + "' and DriveType = 3";
+            var now = DateTime.Now;
+            var objects = new ManagementObjectSearcher(queryString).Get();
             DateTime.Now.Subtract(now);
             foreach (ManagementObject obj2 in objects)
             {

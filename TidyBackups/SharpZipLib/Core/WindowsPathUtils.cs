@@ -36,26 +36,26 @@
 namespace TidyBackups.SharpZipLib.Core
 {
     /// <summary>
-    /// WindowsPathUtils provides simple utilities for handling windows paths.
+    ///     WindowsPathUtils provides simple utilities for handling windows paths.
     /// </summary>
     public abstract class WindowsPathUtils
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="WindowsPathUtils"/> class.
+        ///     Initializes a new instance of the <see cref="WindowsPathUtils" /> class.
         /// </summary>
         internal WindowsPathUtils()
         {
         }
 
         /// <summary>
-        /// Remove any path root present in the path
+        ///     Remove any path root present in the path
         /// </summary>
-        /// <param name="path">A <see cref="string"/> containing path information.</param>
+        /// <param name="path">A <see cref="string" /> containing path information.</param>
         /// <returns>The path with the root removed if it was present; path otherwise.</returns>
-        /// <remarks>Unlike the <see cref="System.IO.Path"/> class the path isnt otherwise checked for validity.</remarks>
+        /// <remarks>Unlike the <see cref="System.IO.Path" /> class the path isnt otherwise checked for validity.</remarks>
         public static string DropPathRoot(string path)
         {
-            string result = path;
+            var result = path;
 
             if ((path != null) && (path.Length > 0))
             {
@@ -64,8 +64,8 @@ namespace TidyBackups.SharpZipLib.Core
                     // UNC name ?
                     if ((path.Length > 1) && ((path[1] == '\\') || (path[1] == '/')))
                     {
-                        int index = 2;
-                        int elements = 2;
+                        var index = 2;
+                        var elements = 2;
 
                         // Scan for two separate elements \\machine\share\restofpath
                         while ((index <= path.Length) &&
@@ -88,7 +88,7 @@ namespace TidyBackups.SharpZipLib.Core
                 }
                 else if ((path.Length > 1) && (path[1] == ':'))
                 {
-                    int dropCount = 2;
+                    var dropCount = 2;
                     if ((path.Length > 2) && ((path[2] == '\\') || (path[2] == '/')))
                     {
                         dropCount = 3;

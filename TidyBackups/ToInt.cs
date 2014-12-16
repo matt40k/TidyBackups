@@ -22,13 +22,13 @@ namespace TidyBackups
     internal class ToInt
     {
         /// <summary>
-        /// Converts the string into an integer for days
+        ///     Converts the string into an integer for days
         /// </summary>
         /// <param name="str"></param>
         /// <returns></returns>
         protected internal static int Days(string str)
         {
-            int value = 0;
+            var value = 0;
             try
             {
                 value = Convert.ToInt16(str);
@@ -41,7 +41,7 @@ namespace TidyBackups
         }
 
         /// <summary>
-        /// Converts the string into an integer for preserve
+        ///     Converts the string into an integer for preserve
         /// </summary>
         /// <param name="str"></param>
         /// <returns></returns>
@@ -61,7 +61,7 @@ namespace TidyBackups
 
         protected internal static int Database(string str)
         {
-            int value = 0;
+            var value = 0;
             try
             {
                 value = Convert.ToInt16(str);

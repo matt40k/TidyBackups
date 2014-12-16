@@ -25,7 +25,7 @@ namespace TidyBackups
     internal class Filter
     {
         /// <summary>
-        /// This is really messy.
+        ///     This is really messy.
         /// </summary>
         /// <param name="path"></param>
         /// <param name="preserve"></param>
@@ -34,8 +34,8 @@ namespace TidyBackups
         {
             var unfilteredFiles = new ArrayList();
 
-            string[] files = Directory.GetFiles(path);
-            foreach (string file in files) // note: file is full path
+            var files = Directory.GetFiles(path);
+            foreach (var file in files) // note: file is full path
             {
                 if (Name.Type(file))
                 {
@@ -58,8 +58,8 @@ namespace TidyBackups
                 // Popular the database Hashtable
                 foreach (string file in unfilteredFiles)
                 {
-                    string filename = Name.GetName(file);
-                    string db = Default.Database(filename);
+                    var filename = Name.GetName(file);
+                    var db = Default.Database(filename);
                     if (db != null)
                     {
                         // Adds db to the dbs Hashtable
@@ -73,17 +73,17 @@ namespace TidyBackups
                 {
                     foreach (string file in unfilteredFiles)
                     {
-                        string t1 = Default.Database(Name.GetName(file));
-                        string t2 = db.Key.ToString();
+                        var t1 = Default.Database(Name.GetName(file));
+                        var t2 = db.Key.ToString();
                         if (t1 == t2)
                         {
                             tmp.Add(Stamp.Get(file) + @"|" + file);
                         }
                     }
                     tmp.Reverse();
-                    for (int i = 0; i < tmp.Count; i++)
+                    for (var i = 0; i < tmp.Count; i++)
                     {
-                        int c = i + 1;
+                        var c = i + 1;
                         var value = tmp[i] as string;
                         if (c > preserve)
                         {
@@ -110,14 +110,14 @@ namespace TidyBackups
         }
 
         /// <summary>
-        /// clean
-        /// Because this is a messy way of working, we have to clean our faces as we go
+        ///     clean
+        ///     Because this is a messy way of working, we have to clean our faces as we go
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
         private static string Clean(string value)
         {
-            string[] parts = value.Split('|');
+            var parts = value.Split('|');
             return parts[1];
         }
     }

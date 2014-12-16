@@ -42,34 +42,22 @@ using TidyBackups.SharpZipLib.Core;
 namespace TidyBackups.SharpZipLib.Zip
 {
     /// <summary>
-    /// ZipNameTransform transforms names as per the Zip file naming convention.
+    ///     ZipNameTransform transforms names as per the Zip file naming convention.
     /// </summary>
-    /// <remarks>The use of absolute names is supported although its use is not valid 
-    /// according to Zip naming conventions, and should not be used if maximum compatability is desired.</remarks>
+    /// <remarks>
+    ///     The use of absolute names is supported although its use is not valid
+    ///     according to Zip naming conventions, and should not be used if maximum compatability is desired.
+    /// </remarks>
     public class ZipNameTransform : INameTransform
     {
-        #region Constructors
+        #region Instance Fields
 
-        /// <summary>
-        /// Initialize a new instance of <see cref="ZipNameTransform"></see>
-        /// </summary>
-        public ZipNameTransform()
-        {
-        }
-
-        /// <summary>
-        /// Initialize a new instance of <see cref="ZipNameTransform"></see>
-        /// </summary>
-        /// <param name="trimPrefix">The string to trim from the front of paths if found.</param>
-        public ZipNameTransform(string trimPrefix)
-        {
-            TrimPrefix = trimPrefix;
-        }
+        private string trimPrefix_;
 
         #endregion
 
         /// <summary>
-        /// Static constructor.
+        ///     Static constructor.
         /// </summary>
         static ZipNameTransform()
         {
@@ -79,7 +67,7 @@ namespace TidyBackups.SharpZipLib.Zip
 #else
             invalidPathChars = Path.GetInvalidPathChars();
 #endif
-            int howMany = invalidPathChars.Length + 2;
+            var howMany = invalidPathChars.Length + 2;
 
             InvalidEntryCharsRelaxed = new char[howMany];
             Array.Copy(invalidPathChars, 0, InvalidEntryCharsRelaxed, 0, invalidPathChars.Length);
@@ -96,10 +84,12 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Get/set the path prefix to be trimmed from paths if present.
+        ///     Get/set the path prefix to be trimmed from paths if present.
         /// </summary>
-        /// <remarks>The prefix is trimmed before any conversion from
-        /// a windows path is done.</remarks>
+        /// <remarks>
+        ///     The prefix is trimmed before any conversion from
+        ///     a windows path is done.
+        /// </remarks>
         public string TrimPrefix
         {
             get { return trimPrefix_; }
@@ -113,88 +103,15 @@ namespace TidyBackups.SharpZipLib.Zip
             }
         }
 
-        #region INameTransform Members
-
         /// <summary>
-        /// Transform a windows directory name according to the Zip file naming conventions.
-        /// </summary>
-        /// <param name="name">The directory name to transform.</param>
-        /// <returns>The transformed name.</returns>
-        public string TransformDirectory(string name)
-        {
-            name = TransformFile(name);
-            if (name.Length > 0)
-            {
-                if (!name.EndsWith("/"))
-                {
-                    name += "/";
-                }
-            }
-            else
-            {
-                throw new ZipException("Cannot have an empty directory name");
-            }
-            return name;
-        }
-
-        /// <summary>
-        /// Transform a windows file name according to the Zip file naming conventions.
-        /// </summary>
-        /// <param name="name">The file name to transform.</param>
-        /// <returns>The transformed name.</returns>
-        public string TransformFile(string name)
-        {
-            if (name != null)
-            {
-                string lowerName = name.ToLower();
-                if ((trimPrefix_ != null) && (lowerName.IndexOf(trimPrefix_) == 0))
-                {
-                    name = name.Substring(trimPrefix_.Length);
-                }
-
-                name = name.Replace(@"\", "/");
-                name = WindowsPathUtils.DropPathRoot(name);
-
-                // Drop any leading slashes.
-                while ((name.Length > 0) && (name[0] == '/'))
-                {
-                    name = name.Remove(0, 1);
-                }
-
-                // Drop any trailing slashes.
-                while ((name.Length > 0) && (name[name.Length - 1] == '/'))
-                {
-                    name = name.Remove(name.Length - 1, 1);
-                }
-
-                // Convert consecutive // characters to /
-                int index = name.IndexOf("//");
-                while (index >= 0)
-                {
-                    name = name.Remove(index, 1);
-                    index = name.IndexOf("//");
-                }
-
-                name = MakeValidName(name, '_');
-            }
-            else
-            {
-                name = string.Empty;
-            }
-            return name;
-        }
-
-        #endregion
-
-        /// <summary>
-        /// Force a name to be valid by replacing invalid characters with a fixed value
+        ///     Force a name to be valid by replacing invalid characters with a fixed value
         /// </summary>
         /// <param name="name">The name to force valid</param>
         /// <param name="replacement">The replacement character to use.</param>
         /// <returns>Returns a valid name</returns>
         private static string MakeValidName(string name, char replacement)
         {
-            int index = name.IndexOfAny(InvalidEntryChars);
+            var index = name.IndexOfAny(InvalidEntryChars);
             if (index >= 0)
             {
                 var builder = new StringBuilder(name);
@@ -224,20 +141,21 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Test a name to see if it is a valid name for a zip entry.
+        ///     Test a name to see if it is a valid name for a zip entry.
         /// </summary>
         /// <param name="name">The name to test.</param>
         /// <param name="relaxed">If true checking is relaxed about windows file names and absolute paths.</param>
         /// <returns>Returns true if the name is a valid zip name; false otherwise.</returns>
-        /// <remarks>Zip path names are actually in Unix format, and should only contain relative paths.
-        /// This means that any path stored should not contain a drive or
-        /// device letter, or a leading slash.  All slashes should forward slashes '/'.
-        /// An empty name is valid for a file where the input comes from standard input.
-        /// A null name is not considered valid.
+        /// <remarks>
+        ///     Zip path names are actually in Unix format, and should only contain relative paths.
+        ///     This means that any path stored should not contain a drive or
+        ///     device letter, or a leading slash.  All slashes should forward slashes '/'.
+        ///     An empty name is valid for a file where the input comes from standard input.
+        ///     A null name is not considered valid.
         /// </remarks>
         public static bool IsValidName(string name, bool relaxed)
         {
-            bool result = (name != null);
+            var result = (name != null);
 
             if (result)
             {
@@ -257,20 +175,21 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Test a name to see if it is a valid name for a zip entry.
+        ///     Test a name to see if it is a valid name for a zip entry.
         /// </summary>
         /// <param name="name">The name to test.</param>
         /// <returns>Returns true if the name is a valid zip name; false otherwise.</returns>
-        /// <remarks>Zip path names are actually in unix format,
-        /// and should only contain relative paths if a path is present.
-        /// This means that the path stored should not contain a drive or
-        /// device letter, or a leading slash.  All slashes should forward slashes '/'.
-        /// An empty name is valid where the input comes from standard input.
-        /// A null name is not considered valid.
+        /// <remarks>
+        ///     Zip path names are actually in unix format,
+        ///     and should only contain relative paths if a path is present.
+        ///     This means that the path stored should not contain a drive or
+        ///     device letter, or a leading slash.  All slashes should forward slashes '/'.
+        ///     An empty name is valid where the input comes from standard input.
+        ///     A null name is not considered valid.
         /// </remarks>
         public static bool IsValidName(string name)
         {
-            bool result =
+            var result =
                 (name != null) &&
                 (name.IndexOfAny(InvalidEntryChars) < 0) &&
                 (name.IndexOf('/') != 0)
@@ -278,9 +197,96 @@ namespace TidyBackups.SharpZipLib.Zip
             return result;
         }
 
-        #region Instance Fields
+        #region Constructors
 
-        private string trimPrefix_;
+        /// <summary>
+        ///     Initialize a new instance of <see cref="ZipNameTransform"></see>
+        /// </summary>
+        public ZipNameTransform()
+        {
+        }
+
+        /// <summary>
+        ///     Initialize a new instance of <see cref="ZipNameTransform"></see>
+        /// </summary>
+        /// <param name="trimPrefix">The string to trim from the front of paths if found.</param>
+        public ZipNameTransform(string trimPrefix)
+        {
+            TrimPrefix = trimPrefix;
+        }
+
+        #endregion
+
+        #region INameTransform Members
+
+        /// <summary>
+        ///     Transform a windows directory name according to the Zip file naming conventions.
+        /// </summary>
+        /// <param name="name">The directory name to transform.</param>
+        /// <returns>The transformed name.</returns>
+        public string TransformDirectory(string name)
+        {
+            name = TransformFile(name);
+            if (name.Length > 0)
+            {
+                if (!name.EndsWith("/"))
+                {
+                    name += "/";
+                }
+            }
+            else
+            {
+                throw new ZipException("Cannot have an empty directory name");
+            }
+            return name;
+        }
+
+        /// <summary>
+        ///     Transform a windows file name according to the Zip file naming conventions.
+        /// </summary>
+        /// <param name="name">The file name to transform.</param>
+        /// <returns>The transformed name.</returns>
+        public string TransformFile(string name)
+        {
+            if (name != null)
+            {
+                var lowerName = name.ToLower();
+                if ((trimPrefix_ != null) && (lowerName.IndexOf(trimPrefix_) == 0))
+                {
+                    name = name.Substring(trimPrefix_.Length);
+                }
+
+                name = name.Replace(@"\", "/");
+                name = WindowsPathUtils.DropPathRoot(name);
+
+                // Drop any leading slashes.
+                while ((name.Length > 0) && (name[0] == '/'))
+                {
+                    name = name.Remove(0, 1);
+                }
+
+                // Drop any trailing slashes.
+                while ((name.Length > 0) && (name[name.Length - 1] == '/'))
+                {
+                    name = name.Remove(name.Length - 1, 1);
+                }
+
+                // Convert consecutive // characters to /
+                var index = name.IndexOf("//");
+                while (index >= 0)
+                {
+                    name = name.Remove(index, 1);
+                    index = name.IndexOf("//");
+                }
+
+                name = MakeValidName(name, '_');
+            }
+            else
+            {
+                name = string.Empty;
+            }
+            return name;
+        }
 
         #endregion
 

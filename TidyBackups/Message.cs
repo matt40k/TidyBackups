@@ -22,22 +22,22 @@ using TidyBackups.Item;
 namespace TidyBackups
 {
     /// <summary>
-    /// Class for outputting real-time information
+    ///     Class for outputting real-time information
     /// </summary>
     internal class Message
     {
         /// <summary>
-        /// The log file path
+        ///     The log file path
         /// </summary>
         protected internal static string Logfile = "";
 
         /// <summary>
-        /// Prints message to Console
+        ///     Prints message to Console
         /// </summary>
         /// <param name="mess"></param>
         protected internal static void Print(string mess)
         {
-            DateTime currTime = DateTime.Now;
+            var currTime = DateTime.Now;
             mess = currTime + " - " + mess;
             Console.WriteLine(mess);
             try
@@ -54,9 +54,8 @@ namespace TidyBackups
             }
         }
 
-
         /// <summary>
-        /// Print message to log file.
+        ///     Print message to log file.
         /// </summary>
         /// <param name="mess"></param>
         private static void Log(string mess)
@@ -78,7 +77,7 @@ namespace TidyBackups
         }
 
         /// <summary>
-        /// Makes the file path a full path
+        ///     Makes the file path a full path
         /// </summary>
         /// <param name="path"></param>
         protected internal static void File(string path)

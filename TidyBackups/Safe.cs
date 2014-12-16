@@ -21,19 +21,17 @@ using TidyBackups.Item;
 namespace TidyBackups
 {
     /// <summary>
-    /// 
     /// </summary>
     internal class Safe
     {
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="path"></param>
         /// <param name="safe"></param>
         protected internal static void Clean(string path, bool safe)
         {
-            string[] files = Directory.GetFiles(path);
-            foreach (string file in files)
+            var files = Directory.GetFiles(path);
+            foreach (var file in files)
             {
                 if (Name.GetExt(file) == ".zip")
                 {

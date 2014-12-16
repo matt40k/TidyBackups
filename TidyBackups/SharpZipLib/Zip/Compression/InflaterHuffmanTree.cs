@@ -41,7 +41,7 @@ using TidyBackups.SharpZipLib.Zip.Compression.Streams;
 namespace TidyBackups.SharpZipLib.Zip.Compression
 {
     /// <summary>
-    /// Huffman tree used for inflation
+    ///     Huffman tree used for inflation
     /// </summary>
     public class InflaterHuffmanTree
     {
@@ -51,28 +51,43 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
 
         #endregion
 
+        /// <summary>
+        ///     Literal length tree
+        /// </summary>
+        public static InflaterHuffmanTree defLitLenTree;
+
+        /// <summary>
+        ///     Distance tree
+        /// </summary>
+        public static InflaterHuffmanTree defDistTree;
+
         #region Instance Fields
 
         private short[] tree;
 
         #endregion
 
-        /// <summary>
-        /// Literal length tree
-        /// </summary>
-        public static InflaterHuffmanTree defLitLenTree;
+        #region Constructors
 
         /// <summary>
-        /// Distance tree
+        ///     Constructs a Huffman tree from the array of code lengths.
         /// </summary>
-        public static InflaterHuffmanTree defDistTree;
+        /// <param name="codeLengths">
+        ///     the array of code lengths
+        /// </param>
+        public InflaterHuffmanTree(byte[] codeLengths)
+        {
+            BuildTree(codeLengths);
+        }
+
+        #endregion
 
         static InflaterHuffmanTree()
         {
             try
             {
                 var codeLengths = new byte[288];
-                int i = 0;
+                var i = 0;
                 while (i < 144)
                 {
                     codeLengths[i++] = 8;
@@ -105,27 +120,12 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
             }
         }
 
-        #region Constructors
-
-        /// <summary>
-        /// Constructs a Huffman tree from the array of code lengths.
-        /// </summary>
-        /// <param name = "codeLengths">
-        /// the array of code lengths
-        /// </param>
-        public InflaterHuffmanTree(byte[] codeLengths)
-        {
-            BuildTree(codeLengths);
-        }
-
-        #endregion
-
         private void BuildTree(byte[] codeLengths)
         {
             var blCount = new int[MAX_BITLEN + 1];
             var nextCode = new int[MAX_BITLEN + 1];
 
-            for (int i = 0; i < codeLengths.Length; i++)
+            for (var i = 0; i < codeLengths.Length; i++)
             {
                 int bits = codeLengths[i];
                 if (bits > 0)
@@ -134,17 +134,17 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
                 }
             }
 
-            int code = 0;
-            int treeSize = 512;
-            for (int bits = 1; bits <= MAX_BITLEN; bits++)
+            var code = 0;
+            var treeSize = 512;
+            for (var bits = 1; bits <= MAX_BITLEN; bits++)
             {
                 nextCode[bits] = code;
                 code += blCount[bits] << (16 - bits);
                 if (bits >= 10)
                 {
                     /* We need an extra table for bit lengths >= 10. */
-                    int start = nextCode[bits] & 0x1ff80;
-                    int end = code & 0x1ff80;
+                    var start = nextCode[bits] & 0x1ff80;
+                    var end = code & 0x1ff80;
                     treeSize += (end - start) >> (16 - bits);
                 }
             }
@@ -159,20 +159,20 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
 			* bit len.  This way the sub trees will be aligned.
 			*/
             tree = new short[treeSize];
-            int treePtr = 512;
-            for (int bits = MAX_BITLEN; bits >= 10; bits--)
+            var treePtr = 512;
+            for (var bits = MAX_BITLEN; bits >= 10; bits--)
             {
-                int end = code & 0x1ff80;
+                var end = code & 0x1ff80;
                 code -= blCount[bits] << (16 - bits);
-                int start = code & 0x1ff80;
-                for (int i = start; i < end; i += 1 << 7)
+                var start = code & 0x1ff80;
+                for (var i = start; i < end; i += 1 << 7)
                 {
                     tree[DeflaterHuffman.BitReverse(i)] = (short) ((-treePtr << 4) | bits);
                     treePtr += 1 << (bits - 9);
                 }
             }
 
-            for (int i = 0; i < codeLengths.Length; i++)
+            for (var i = 0; i < codeLengths.Length; i++)
             {
                 int bits = codeLengths[i];
                 if (bits == 0)
@@ -192,7 +192,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
                 else
                 {
                     int subTree = tree[revcode & 511];
-                    int treeLen = 1 << (subTree & 15);
+                    var treeLen = 1 << (subTree & 15);
                     subTree = -(subTree >> 4);
                     do
                     {
@@ -205,14 +205,14 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
         }
 
         /// <summary>
-        /// Reads the next symbol from input.  The symbol is encoded using the
-        /// huffman tree.
+        ///     Reads the next symbol from input.  The symbol is encoded using the
+        ///     huffman tree.
         /// </summary>
         /// <param name="input">
-        /// input the input source.
+        ///     input the input source.
         /// </param>
         /// <returns>
-        /// the next symbol, or -1 if not enough input is available.
+        ///     the next symbol, or -1 if not enough input is available.
         /// </returns>
         public int GetSymbol(StreamManipulator input)
         {
@@ -224,45 +224,33 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
                     input.DropBits(symbol & 15);
                     return symbol >> 4;
                 }
-                int subtree = -(symbol >> 4);
-                int bitlen = symbol & 15;
+                var subtree = -(symbol >> 4);
+                var bitlen = symbol & 15;
                 if ((lookahead = input.PeekBits(bitlen)) >= 0)
                 {
                     symbol = tree[subtree | (lookahead >> 9)];
                     input.DropBits(symbol & 15);
                     return symbol >> 4;
                 }
-                else
-                {
-                    int bits = input.AvailableBits;
-                    lookahead = input.PeekBits(bits);
-                    symbol = tree[subtree | (lookahead >> 9)];
-                    if ((symbol & 15) <= bits)
-                    {
-                        input.DropBits(symbol & 15);
-                        return symbol >> 4;
-                    }
-                    else
-                    {
-                        return -1;
-                    }
-                }
-            }
-            else
-            {
-                int bits = input.AvailableBits;
+                var bits = input.AvailableBits;
                 lookahead = input.PeekBits(bits);
-                symbol = tree[lookahead];
-                if (symbol >= 0 && (symbol & 15) <= bits)
+                symbol = tree[subtree | (lookahead >> 9)];
+                if ((symbol & 15) <= bits)
                 {
                     input.DropBits(symbol & 15);
                     return symbol >> 4;
                 }
-                else
-                {
-                    return -1;
-                }
+                return -1;
             }
+            var bits = input.AvailableBits;
+            lookahead = input.PeekBits(bits);
+            symbol = tree[lookahead];
+            if (symbol >= 0 && (symbol & 15) <= bits)
+            {
+                input.DropBits(symbol & 15);
+                return symbol >> 4;
+            }
+            return -1;
         }
     }
 }

@@ -18,23 +18,22 @@
 namespace TidyBackups.Naming
 {
     /// <summary>
-    /// Class for the default naming conventions 
+    ///     Class for the default naming conventions
     /// </summary>
     internal class Default
     {
         /// <summary>
-        /// TidyBackups.Naming.Default.Database returns a string.
-        /// It gets the database name from the file name, it splits the string up by underscores (_) and uses the first 
-        /// sub string assuming there is more then 3.
-        /// 
-        /// Default: DATABASENAME_YYYYMMDD_HHMMSS.zip
+        ///     TidyBackups.Naming.Default.Database returns a string.
+        ///     It gets the database name from the file name, it splits the string up by underscores (_) and uses the first
+        ///     sub string assuming there is more then 3.
+        ///     Default: DATABASENAME_YYYYMMDD_HHMMSS.zip
         /// </summary>
         /// <param name="filename"></param>
         /// <returns></returns>
         protected internal static string Database(string filename)
         {
             string value = null;
-            string[] parts = filename.Split('_');
+            var parts = filename.Split('_');
 #if MS_TEST
             Console.WriteLine(parts.Length.ToString());
 #endif

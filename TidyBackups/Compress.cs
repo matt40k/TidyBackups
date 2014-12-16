@@ -23,14 +23,14 @@ using TidyBackups.SharpZipLib.Zip;
 namespace TidyBackups
 {
     /// <summary>
-    /// Class for the Compression logic
+    ///     Class for the Compression logic
     /// </summary>
     internal class Compress
     {
         protected internal static void Archive(string path, bool safe)
         {
-            string[] files = Directory.GetFiles(path);
-            foreach (string file in files)
+            var files = Directory.GetFiles(path);
+            foreach (var file in files)
             {
                 if (Name.ToCompress(file))
                 {
@@ -40,17 +40,17 @@ namespace TidyBackups
         }
 
         /// <summary>
-        /// Runs logic for creating zip, it'll do a bit of last min checking first.
+        ///     Runs logic for creating zip, it'll do a bit of last min checking first.
         /// </summary>
         /// <param name="path"></param>
         /// <param name="safe"></param>
         protected internal static void CompressZip(string path, bool safe)
         {
-            string dir = Name.GetDir(path);
-            string nam = Name.GetName(path);
-            string ext = Name.GetExt(path);
-            DateTime created = Stamp.Get(path);
-            string name = path.Replace(ext, ".zip");
+            var dir = Name.GetDir(path);
+            var nam = Name.GetName(path);
+            var ext = Name.GetExt(path);
+            var created = Stamp.Get(path);
+            var name = path.Replace(ext, ".zip");
             if (!File.Exists(name))
             {
                 Write(name, dir, nam);
@@ -67,8 +67,8 @@ namespace TidyBackups
                 else
                 {
                     // If the compressed file is not corrupt. We'll give it a new name, based on the time. 
-                    string dt = String.Format("_{0:yyyy-MM-dd_hh-mm-ss}.zip", DateTime.Now);
-                    string newname = path.Replace(ext, dt);
+                    var dt = String.Format("_{0:yyyy-MM-dd_hh-mm-ss}.zip", DateTime.Now);
+                    var newname = path.Replace(ext, dt);
                     Write(newname, dir, nam);
                     Stamp.Set(newname, created);
                     Message.Print("  COMPRESSED " + path);
@@ -79,7 +79,7 @@ namespace TidyBackups
         }
 
         /// <summary>
-        /// Checks zip is able to be opened and valid.
+        ///     Checks zip is able to be opened and valid.
         /// </summary>
         /// <param name="path"></param>
         /// <param name="name"></param>
@@ -87,7 +87,7 @@ namespace TidyBackups
         /// <returns></returns>
         protected internal static bool Read(string path, string name, bool safe)
         {
-            bool value = false;
+            var value = false;
             try
             {
                 using (var s = new ZipInputStream(File.OpenRead(path)))
@@ -131,7 +131,7 @@ namespace TidyBackups
         }
 
         /// <summary>
-        /// Creates the zip
+        ///     Creates the zip
         /// </summary>
         /// <param name="filename"></param>
         /// <param name="dir"></param>

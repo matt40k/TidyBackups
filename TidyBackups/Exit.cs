@@ -20,12 +20,12 @@ using System;
 namespace TidyBackups
 {
     /// <summary>
-    /// Exit class
+    ///     Exit class
     /// </summary>
     internal class Exit
     {
         /// <summary>
-        /// Exits safely, will produce exit message and exit code.
+        ///     Exits safely, will produce exit message and exit code.
         /// </summary>
         /// <param name="code"></param>
         protected internal static void End(int code)
@@ -45,7 +45,7 @@ namespace TidyBackups
         }
 
         /// <summary>
-        /// Makes exit codes friendly.
+        ///     Makes exit codes friendly.
         /// </summary>
         /// <param name="code"></param>
         /// <returns></returns>

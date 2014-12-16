@@ -20,12 +20,11 @@ using System;
 namespace TidyBackups
 {
     /// <summary>
-    /// 
     /// </summary>
     internal class License
     {
         /// <summary>
-        /// Prints license information to Console
+        ///     Prints license information to Console
         /// </summary>
         protected internal static void Print()
         {

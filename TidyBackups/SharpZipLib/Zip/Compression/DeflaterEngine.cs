@@ -43,26 +43,26 @@ using TidyBackups.SharpZipLib.Checksums;
 namespace TidyBackups.SharpZipLib.Zip.Compression
 {
     /// <summary>
-    /// Strategies for deflater
+    ///     Strategies for deflater
     /// </summary>
     public enum DeflateStrategy
     {
         /// <summary>
-        /// The default strategy
+        ///     The default strategy
         /// </summary>
         Default = 0,
 
         /// <summary>
-        /// This strategy will only allow longer string repetitions.  It is
-        /// useful for random data with a small character set.
+        ///     This strategy will only allow longer string repetitions.  It is
+        ///     useful for random data with a small character set.
         /// </summary>
         Filtered = 1,
 
 
         /// <summary>
-        /// This strategy will not look for string repetitions at all.  It
-        /// only encodes with Huffman trees (which means, that more common
-        /// characters get a smaller encoding.
+        ///     This strategy will not look for string repetitions at all.  It
+        ///     only encodes with Huffman trees (which means, that more common
+        ///     characters get a smaller encoding.
         /// </summary>
         HuffmanOnly = 2
     }
@@ -82,8 +82,8 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
 
 
     /// <summary>
-    /// Low level compression engine for deflate algorithm which uses a 32K sliding window
-    /// with secondary compression from Huffman/Shannon-Fano codes.
+    ///     Low level compression engine for deflate algorithm which uses a 32K sliding window
+    ///     with secondary compression from Huffman/Shannon-Fano codes.
     /// </summary>
     public class DeflaterEngine : DeflaterConstants
     {
@@ -96,11 +96,12 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
         #region Constructors
 
         /// <summary>
-        /// Construct instance with pending buffer
+        ///     Construct instance with pending buffer
         /// </summary>
         /// <param name="pending">
-        /// Pending buffer to use
-        /// </param>>
+        ///     Pending buffer to use
+        /// </param>
+        /// >
         public DeflaterEngine(DeflaterPending pending)
         {
             this.pending = pending;
@@ -119,32 +120,28 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
         #endregion
 
         /// <summary>
-        /// Get current value of Adler checksum
-        /// </summary>		
+        ///     Get current value of Adler checksum
+        /// </summary>
         public int Adler
         {
             get { return unchecked((int) adler.Value); }
         }
 
         /// <summary>
-        /// Total data processed
-        /// </summary>		
+        ///     Total data processed
+        /// </summary>
         public long TotalIn
         {
             get { return totalIn; }
         }
 
         /// <summary>
-        /// Get/set the <see cref="DeflateStrategy">deflate strategy</see>
-        /// </summary>		
-        public DeflateStrategy Strategy
-        {
-            get { return strategy; }
-            set { strategy = value; }
-        }
+        ///     Get/set the <see cref="DeflateStrategy">deflate strategy</see>
+        /// </summary>
+        public DeflateStrategy Strategy { get; set; }
 
         /// <summary>
-        /// Deflate drives actual compression of data
+        ///     Deflate drives actual compression of data
         /// </summary>
         /// <param name="flush">True to flush input buffers</param>
         /// <param name="finish">Finish deflation with the current input.</param>
@@ -155,7 +152,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
             do
             {
                 FillWindow();
-                bool canFlush = flush && (inputOff == inputEnd);
+                var canFlush = flush && (inputOff == inputEnd);
 
 #if DebugDeflation
 				if (DeflaterConstants.DEBUGGING) {
@@ -182,8 +179,8 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
         }
 
         /// <summary>
-        /// Sets input data to be deflated.  Should only be called when <code>NeedsInput()</code>
-        /// returns true
+        ///     Sets input data to be deflated.  Should only be called when <code>NeedsInput()</code>
+        ///     returns true
         /// </summary>
         /// <param name="buffer">The buffer containing input data.</param>
         /// <param name="offset">The offset of the first byte of data.</param>
@@ -210,7 +207,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
                 throw new InvalidOperationException("Old input was not completely processed");
             }
 
-            int end = offset + count;
+            var end = offset + count;
 
             /* We want to throw an ArrayIndexOutOfBoundsException early.  The
 			* check is very tricky: it also handles integer wrap around.
@@ -226,8 +223,8 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
         }
 
         /// <summary>
-        /// Determines if more <see cref="SetInput">input</see> is needed.
-        /// </summary>		
+        ///     Determines if more <see cref="SetInput">input</see> is needed.
+        /// </summary>
         /// <returns>Return true if input is needed via <see cref="SetInput">SetInput</see></returns>
         public bool NeedsInput()
         {
@@ -235,7 +232,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
         }
 
         /// <summary>
-        /// Set compression dictionary
+        ///     Set compression dictionary
         /// </summary>
         /// <param name="buffer">The buffer containing the dictionary data</param>
         /// <param name="offset">The offset in the buffer for the first byte of data</param>
@@ -274,8 +271,8 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
         }
 
         /// <summary>
-        /// Reset internal state
-        /// </summary>		
+        ///     Reset internal state
+        /// </summary>
         public void Reset()
         {
             huffman.Reset();
@@ -286,27 +283,27 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
             prevAvailable = false;
             matchLen = MIN_MATCH - 1;
 
-            for (int i = 0; i < HASH_SIZE; i++)
+            for (var i = 0; i < HASH_SIZE; i++)
             {
                 head[i] = 0;
             }
 
-            for (int i = 0; i < WSIZE; i++)
+            for (var i = 0; i < WSIZE; i++)
             {
                 prev[i] = 0;
             }
         }
 
         /// <summary>
-        /// Reset Adler checksum
-        /// </summary>		
+        ///     Reset Adler checksum
+        /// </summary>
         public void ResetAdler()
         {
             adler.Reset();
         }
 
         /// <summary>
-        /// Set the deflate level (0-9)
+        ///     Set the deflate level (0-9)
         /// </summary>
         /// <param name="level">The value to set the level to.</param>
         public void SetLevel(int level)
@@ -335,7 +332,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
                         if (strstart > blockStart)
                         {
                             huffman.FlushStoredBlock(window, blockStart,
-                                                     strstart - blockStart, false);
+                                strstart - blockStart, false);
                             blockStart = strstart;
                         }
                         UpdateHash();
@@ -345,7 +342,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
                         if (strstart > blockStart)
                         {
                             huffman.FlushBlock(window, blockStart, strstart - blockStart,
-                                               false);
+                                false);
                             blockStart = strstart;
                         }
                         break;
@@ -369,7 +366,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
         }
 
         /// <summary>
-        /// Fill the window
+        ///     Fill the window
         /// </summary>
         public void FillWindow()
         {
@@ -386,7 +383,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
 			 */
             while (lookahead < MIN_LOOKAHEAD && inputOff < inputEnd)
             {
-                int more = 2*WSIZE - lookahead - strstart;
+                var more = 2*WSIZE - lookahead - strstart;
 
                 if (more > inputEnd - inputOff)
                 {
@@ -418,14 +415,14 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
         }
 
         /// <summary>
-        /// Inserts the current string in the head hash and returns the previous
-        /// value for this hash.
+        ///     Inserts the current string in the head hash and returns the previous
+        ///     value for this hash.
         /// </summary>
         /// <returns>The previous hash value</returns>
         private int InsertString()
         {
             short match;
-            int hash = ((ins_h << HASH_SHIFT) ^ window[strstart + (MIN_MATCH - 1)]) & HASH_MASK;
+            var hash = ((ins_h << HASH_SHIFT) ^ window[strstart + (MIN_MATCH - 1)]) & HASH_MASK;
 
 #if DebugDeflation
 			if (DeflaterConstants.DEBUGGING) 
@@ -455,45 +452,44 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
 
             // Slide the hash table (could be avoided with 32 bit values
             // at the expense of memory usage).
-            for (int i = 0; i < HASH_SIZE; ++i)
+            for (var i = 0; i < HASH_SIZE; ++i)
             {
-                int m = head[i] & 0xffff;
+                var m = head[i] & 0xffff;
                 head[i] = (short) (m >= WSIZE ? (m - WSIZE) : 0);
             }
 
             // Slide the prev table.
-            for (int i = 0; i < WSIZE; i++)
+            for (var i = 0; i < WSIZE; i++)
             {
-                int m = prev[i] & 0xffff;
+                var m = prev[i] & 0xffff;
                 prev[i] = (short) (m >= WSIZE ? (m - WSIZE) : 0);
             }
         }
 
         /// <summary>
-        /// Find the best (longest) string in the window matching the 
-        /// string starting at strstart.
-        ///
-        /// Preconditions:
-        /// <code>
-        /// strstart + MAX_MATCH &lt;= window.length.</code>
+        ///     Find the best (longest) string in the window matching the
+        ///     string starting at strstart.
+        ///     Preconditions:
+        ///     <code>
+        ///  strstart + MAX_MATCH &lt;= window.length.</code>
         /// </summary>
         /// <param name="curMatch"></param>
         /// <returns>True if a match greater than the minimum length is found</returns>
         private bool FindLongestMatch(int curMatch)
         {
-            int chainLength = max_chain;
-            int niceLength = this.niceLength;
-            short[] prev = this.prev;
-            int scan = strstart;
+            var chainLength = max_chain;
+            var niceLength = this.niceLength;
+            var prev = this.prev;
+            var scan = strstart;
             int match;
-            int best_end = strstart + matchLen;
-            int best_len = Math.Max(matchLen, MIN_MATCH - 1);
+            var best_end = strstart + matchLen;
+            var best_len = Math.Max(matchLen, MIN_MATCH - 1);
 
-            int limit = Math.Max(strstart - MAX_DIST, 0);
+            var limit = Math.Max(strstart - MAX_DIST, 0);
 
-            int strend = strstart + MAX_MATCH - 1;
-            byte scan_end1 = window[best_end - 1];
-            byte scan_end = window[best_end];
+            var strend = strstart + MAX_MATCH - 1;
+            var scan_end1 = window[best_end - 1];
+            var scan_end = window[best_end];
 
             // Do not waste too much time if we already have a good match:
             if (best_len >= goodLength)
@@ -589,13 +585,13 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
             strstart += lookahead;
             lookahead = 0;
 
-            int storedLength = strstart - blockStart;
+            var storedLength = strstart - blockStart;
 
             if ((storedLength >= MAX_BLOCK_SIZE) || // Block is full
                 (blockStart < WSIZE && storedLength >= MAX_DIST) || // Block may move out of window
                 flush)
             {
-                bool lastBlock = finish;
+                var lastBlock = finish;
                 if (storedLength > MAX_BLOCK_SIZE)
                 {
                     storedLength = MAX_BLOCK_SIZE;
@@ -645,7 +641,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
                 int hashHead;
                 if (lookahead >= MIN_MATCH &&
                     (hashHead = InsertString()) != 0 &&
-                    strategy != DeflateStrategy.HuffmanOnly &&
+                    Strategy != DeflateStrategy.HuffmanOnly &&
                     strstart - hashHead <= MAX_DIST &&
                     FindLongestMatch(hashHead))
                 {
@@ -661,7 +657,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
 					}
 #endif
 
-                    bool full = huffman.TallyDist(strstart - matchStart, matchLen);
+                    var full = huffman.TallyDist(strstart - matchStart, matchLen);
 
                     lookahead -= matchLen;
                     if (matchLen <= max_lazy && lookahead >= MIN_MATCH)
@@ -697,7 +693,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
 
                 if (huffman.IsFull())
                 {
-                    bool lastBlock = finish && (lookahead == 0);
+                    var lastBlock = finish && (lookahead == 0);
                     huffman.FlushBlock(window, blockStart, strstart - blockStart, lastBlock);
                     blockStart = strstart;
                     return !lastBlock;
@@ -731,7 +727,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
 					}
 #endif
                     huffman.FlushBlock(window, blockStart, strstart - blockStart,
-                                       finish);
+                        finish);
                     blockStart = strstart;
                     return false;
                 }
@@ -745,13 +741,13 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
                     SlideWindow();
                 }
 
-                int prevMatch = matchStart;
-                int prevLen = matchLen;
+                var prevMatch = matchStart;
+                var prevLen = matchLen;
                 if (lookahead >= MIN_MATCH)
                 {
-                    int hashHead = InsertString();
+                    var hashHead = InsertString();
 
-                    if (strategy != DeflateStrategy.HuffmanOnly &&
+                    if (Strategy != DeflateStrategy.HuffmanOnly &&
                         hashHead != 0 &&
                         strstart - hashHead <= MAX_DIST &&
                         FindLongestMatch(hashHead))
@@ -760,7 +756,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
 
                         // Discard match if too small and too far away
                         if (matchLen <= 5 &&
-                            (strategy == DeflateStrategy.Filtered ||
+                            (Strategy == DeflateStrategy.Filtered ||
                              (matchLen == MIN_MATCH && strstart - matchStart > TooFar)))
                         {
                             matchLen = MIN_MATCH - 1;
@@ -810,12 +806,12 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
 
                 if (huffman.IsFull())
                 {
-                    int len = strstart - blockStart;
+                    var len = strstart - blockStart;
                     if (prevAvailable)
                     {
                         len--;
                     }
-                    bool lastBlock = (finish && (lookahead == 0) && !prevAvailable);
+                    var lastBlock = (finish && (lookahead == 0) && !prevAvailable);
                     huffman.FlushBlock(window, blockStart, len, lastBlock);
                     blockStart += len;
                     return !lastBlock;
@@ -829,15 +825,15 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
         // Hash index of string to be inserted
 
         /// <summary>
-        /// The adler checksum
+        ///     The adler checksum
         /// </summary>
         private readonly Adler32 adler;
 
         /// <summary>
-        /// Hashtable, hashing three characters to an index for window, so
-        /// that window[index]..window[index+2] have this hash code.  
-        /// Note that the array should really be unsigned short, so you need
-        /// to and the values with 0xffff.
+        ///     Hashtable, hashing three characters to an index for window, so
+        ///     that window[index]..window[index+2] have this hash code.
+        ///     Note that the array should really be unsigned short, so you need
+        ///     to and the values with 0xffff.
         /// </summary>
         private readonly short[] head;
 
@@ -845,51 +841,51 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
         private readonly DeflaterPending pending;
 
         /// <summary>
-        /// <code>prev[index &amp; WMASK]</code> points to the previous index that has the
-        /// same hash code as the string starting at index.  This way 
-        /// entries with the same hash code are in a linked list.
-        /// Note that the array should really be unsigned short, so you need
-        /// to and the values with 0xffff.
+        ///     <code>prev[index &amp; WMASK]</code> points to the previous index that has the
+        ///     same hash code as the string starting at index.  This way
+        ///     entries with the same hash code are in a linked list.
+        ///     Note that the array should really be unsigned short, so you need
+        ///     to and the values with 0xffff.
         /// </summary>
         private readonly short[] prev;
 
         /// <summary>
-        /// This array contains the part of the uncompressed stream that 
-        /// is of relevance.  The current character is indexed by strstart.
+        ///     This array contains the part of the uncompressed stream that
+        ///     is of relevance.  The current character is indexed by strstart.
         /// </summary>
         private readonly byte[] window;
 
         private int blockStart;
 
         /// <summary>
-        /// The current compression function.
+        ///     The current compression function.
         /// </summary>
         private int compressionFunction;
 
         private int goodLength;
 
         /// <summary>
-        /// The input data for compression.
+        ///     The input data for compression.
         /// </summary>
         private byte[] inputBuf;
 
         /// <summary>
-        /// The end offset of the input data.
+        ///     The end offset of the input data.
         /// </summary>
         private int inputEnd;
 
         /// <summary>
-        /// The offset into inputBuf, where input data starts.
+        ///     The offset into inputBuf, where input data starts.
         /// </summary>
         private int inputOff;
 
         private int ins_h;
 
         /// <summary>
-        /// lookahead is the number of characters starting at strstart in
-        /// window that are valid.
-        /// So window[strstart] until window[strstart+lookahead-1] are valid
-        /// characters.
+        ///     lookahead is the number of characters starting at strstart in
+        ///     window that are valid.
+        ///     So window[strstart] until window[strstart+lookahead-1] are valid
+        ///     characters.
         /// </summary>
         private int lookahead;
 
@@ -898,15 +894,14 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
 
         private int max_chain, max_lazy, niceLength;
         private bool prevAvailable;
-        private DeflateStrategy strategy;
 
         /// <summary>
-        /// Points to the current character in the window.
+        ///     Points to the current character in the window.
         /// </summary>
         private int strstart;
 
         /// <summary>
-        /// The total bytes of input read.
+        ///     The total bytes of input read.
         /// </summary>
         private long totalIn;
 

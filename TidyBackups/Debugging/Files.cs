@@ -16,7 +16,6 @@
  */
 
 using System.IO;
-using TidyBackups;
 using TidyBackups.Item;
 
 namespace TidyBackups.Debug
@@ -25,10 +24,10 @@ namespace TidyBackups.Debug
     {
         protected internal static void Filtered(string path)
         {
-            foreach (string str in Directory.GetFiles(path))
+            foreach (var str in Directory.GetFiles(path))
             {
                 if (Name.Type(str))
-                    Message.Print("  " + (object)str + " - Age:" + (string)(object)Days.Age(str) + "days");
+                    Message.Print("  " + (object) str + " - Age:" + (string) (object) Days.Age(str) + "days");
                 else
                     Message.Print("  IGNORING: " + str);
             }

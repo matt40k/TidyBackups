@@ -49,6 +49,7 @@ using TidyBackups.SharpZipLib.Core;
 using TidyBackups.SharpZipLib.Encryption;
 using TidyBackups.SharpZipLib.Zip.Compression;
 using TidyBackups.SharpZipLib.Zip.Compression.Streams;
+
 #if !NETCF_1_0
 #endif
 
@@ -58,14 +59,20 @@ namespace TidyBackups.SharpZipLib.Zip
     #region Keys Required Event Args
 
     /// <summary>
-    /// Arguments used with KeysRequiredEvent
+    ///     Arguments used with KeysRequiredEvent
     /// </summary>
     public class KeysRequiredEventArgs : EventArgs
     {
+        #region Instance Fields
+
+        private readonly string fileName;
+
+        #endregion
+
         #region Constructors
 
         /// <summary>
-        /// Initialise a new instance of <see cref="KeysRequiredEventArgs"></see>
+        ///     Initialise a new instance of <see cref="KeysRequiredEventArgs"></see>
         /// </summary>
         /// <param name="name">The name of the file for which keys are required.</param>
         public KeysRequiredEventArgs(string name)
@@ -74,7 +81,7 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Initialise a new instance of <see cref="KeysRequiredEventArgs"></see>
+        ///     Initialise a new instance of <see cref="KeysRequiredEventArgs"></see>
         /// </summary>
         /// <param name="name">The name of the file for which keys are required.</param>
         /// <param name="keyValue">The current key value.</param>
@@ -89,7 +96,7 @@ namespace TidyBackups.SharpZipLib.Zip
         #region Properties
 
         /// <summary>
-        /// Gets the name of the file for which keys are required.
+        ///     Gets the name of the file for which keys are required.
         /// </summary>
         public string FileName
         {
@@ -97,15 +104,9 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Gets or sets the key value
+        ///     Gets or sets the key value
         /// </summary>
         public byte[] Key { get; set; }
-
-        #endregion
-
-        #region Instance Fields
-
-        private readonly string fileName;
 
         #endregion
     }
@@ -115,69 +116,76 @@ namespace TidyBackups.SharpZipLib.Zip
     #region Test Definitions
 
     /// <summary>
-    /// The strategy to apply to testing.
+    ///     The strategy to apply to testing.
     /// </summary>
     public enum TestStrategy
     {
         /// <summary>
-        /// Find the first error only.
+        ///     Find the first error only.
         /// </summary>
         FindFirstError,
+
         /// <summary>
-        /// Find all possible errors.
+        ///     Find all possible errors.
         /// </summary>
-        FindAllErrors,
+        FindAllErrors
     }
 
     /// <summary>
-    /// The operation in progress reported by a <see cref="ZipTestResultHandler"/> during testing.
+    ///     The operation in progress reported by a <see cref="ZipTestResultHandler" /> during testing.
     /// </summary>
     /// <seealso cref="ZipFile.TestArchive(bool)">TestArchive</seealso>
     public enum TestOperation
     {
         /// <summary>
-        /// Setting up testing.
+        ///     Setting up testing.
         /// </summary>
         Initialising,
 
         /// <summary>
-        /// Testing an individual entries header
+        ///     Testing an individual entries header
         /// </summary>
         EntryHeader,
 
         /// <summary>
-        /// Testing an individual entries data
+        ///     Testing an individual entries data
         /// </summary>
         EntryData,
 
         /// <summary>
-        /// Testing an individual entry has completed.
+        ///     Testing an individual entry has completed.
         /// </summary>
         EntryComplete,
 
         /// <summary>
-        /// Running miscellaneous tests
+        ///     Running miscellaneous tests
         /// </summary>
         MiscellaneousTests,
 
         /// <summary>
-        /// Testing is complete
+        ///     Testing is complete
         /// </summary>
-        Complete,
+        Complete
     }
 
     /// <summary>
-    /// Status returned returned by <see cref="ZipTestResultHandler"/> during testing.
+    ///     Status returned returned by <see cref="ZipTestResultHandler" /> during testing.
     /// </summary>
     /// <seealso cref="ZipFile.TestArchive(bool)">TestArchive</seealso>
     public class TestStatus
     {
+        #region Instance Fields
+
+        private readonly ZipFile file_;
+
+        #endregion
+
         #region Constructors
 
         /// <summary>
-        /// Initialise a new instance of <see cref="TestStatus"/>
+        ///     Initialise a new instance of <see cref="TestStatus" />
         /// </summary>
-        /// <param name="file">The <see cref="ZipFile"/> this status applies to.</param>
+        /// <param name="file">The <see cref="ZipFile" /> this status applies to.</param>
         public TestStatus(ZipFile file)
         {
             file_ = file;
@@ -188,15 +196,12 @@ namespace TidyBackups.SharpZipLib.Zip
         #region Properties
 
         /// <summary>
-        /// Get the current <see cref="TestOperation"/> in progress.
+        ///     Get the current <see cref="TestOperation" /> in progress.
         /// </summary>
-        public TestOperation Operation
-        {
-            get { return operation_; }
-        }
+        public TestOperation Operation { get; private set; }
 
         /// <summary>
-        /// Get the <see cref="ZipFile"/> this status is applicable to.
+        ///     Get the <see cref="ZipFile" /> this status is applicable to.
         /// </summary>
         public ZipFile File
         {
@@ -204,36 +209,24 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Get the current/last entry tested.
+        ///     Get the current/last entry tested.
         /// </summary>
-        public ZipEntry Entry
-        {
-            get { return entry_; }
-        }
+        public ZipEntry Entry { get; private set; }
 
         /// <summary>
-        /// Get the number of errors detected so far.
+        ///     Get the number of errors detected so far.
         /// </summary>
-        public int ErrorCount
-        {
-            get { return errorCount_; }
-        }
+        public int ErrorCount { get; private set; }
 
         /// <summary>
-        /// Get the number of bytes tested so far for the current entry.
+        ///     Get the number of bytes tested so far for the current entry.
         /// </summary>
-        public long BytesTested
-        {
-            get { return bytesTested_; }
-        }
+        public long BytesTested { get; private set; }
 
         /// <summary>
-        /// Get a value indicating wether the last entry test was valid.
+        ///     Get a value indicating wether the last entry test was valid.
         /// </summary>
-        public bool EntryValid
-        {
-            get { return entryValid_; }
-        }
+        public bool EntryValid { get; private set; }
 
         #endregion
 
@@ -241,46 +234,38 @@ namespace TidyBackups.SharpZipLib.Zip
 
         internal void AddError()
         {
-            errorCount_++;
-            entryValid_ = false;
+            ErrorCount++;
+            EntryValid = false;
         }
 
         internal void SetOperation(TestOperation operation)
         {
-            operation_ = operation;
+            Operation = operation;
         }
 
         internal void SetEntry(ZipEntry entry)
         {
-            entry_ = entry;
-            entryValid_ = true;
-            bytesTested_ = 0;
+            Entry = entry;
+            EntryValid = true;
+            BytesTested = 0;
         }
 
         internal void SetBytesTested(long value)
         {
-            bytesTested_ = value;
+            BytesTested = value;
         }
-
-        #endregion
-
-        #region Instance Fields
-
-        private readonly ZipFile file_;
-        private long bytesTested_;
-        private bool entryValid_;
-        private ZipEntry entry_;
-        private int errorCount_;
-        private TestOperation operation_;
 
         #endregion
     }
 
     /// <summary>
-    /// Delegate invoked during <see cref="ZipFile.TestArchive(bool, TestStrategy, ZipTestResultHandler)">testing</see> if supplied indicating current progress and status.
+    ///     Delegate invoked during <see cref="ZipFile.TestArchive(bool, TestStrategy, ZipTestResultHandler)">testing</see> if
+    ///     supplied indicating current progress and status.
     /// </summary>
-    /// <remarks>If the message is non-null an error has occured.  If the message is null
-    /// the operation as found in <see cref="TestStatus">status</see> has started.</remarks>
+    /// <remarks>
+    ///     If the message is non-null an error has occured.  If the message is null
+    ///     the operation as found in <see cref="TestStatus">status</see> has started.
+    /// </remarks>
     public delegate void ZipTestResultHandler(TestStatus status, string message);
 
     #endregion
@@ -288,18 +273,19 @@ namespace TidyBackups.SharpZipLib.Zip
     #region Update Definitions
 
     /// <summary>
-    /// The possible ways of <see cref="ZipFile.CommitUpdate()">applying updates</see> to an archive.
+    ///     The possible ways of <see cref="ZipFile.CommitUpdate()">applying updates</see> to an archive.
     /// </summary>
     public enum FileUpdateMode
     {
         /// <summary>
-        /// Perform all updates on temporary files ensuring that the original file is saved.
+        ///     Perform all updates on temporary files ensuring that the original file is saved.
         /// </summary>
         Safe,
+
         /// <summary>
-        /// Update the archive directly, which is faster but less safe.
+        ///     Update the archive directly, which is faster but less safe.
         /// </summary>
-        Direct,
+        Direct
     }
 
     #endregion
@@ -307,19 +293,17 @@ namespace TidyBackups.SharpZipLib.Zip
     #region ZipFile Class
 
     /// <summary>
-    /// This class represents a Zip archive.  You can ask for the contained
-    /// entries, or get an input stream for a file entry.  The entry is
-    /// automatically decompressed.
-    /// 
-    /// You can also update the archive adding or deleting entries.
-    /// 
-    /// This class is thread safe for input:  You can open input streams for arbitrary
-    /// entries in different threads.
-    /// <br/>
-    /// <br/>Author of the original java version : Jochen Hoenicke
+    ///     This class represents a Zip archive.  You can ask for the contained
+    ///     entries, or get an input stream for a file entry.  The entry is
+    ///     automatically decompressed.
+    ///     You can also update the archive adding or deleting entries.
+    ///     This class is thread safe for input:  You can open input streams for arbitrary
+    ///     entries in different threads.
+    ///     <br />
+    ///     <br />Author of the original java version : Jochen Hoenicke
     /// </summary>
     /// <example>
-    /// <code>
+    ///     <code>
     /// using System;
     /// using System.Text;
     /// using System.Collections;
@@ -354,7 +338,7 @@ namespace TidyBackups.SharpZipLib.Zip
         #region KeyHandling
 
         /// <summary>
-        /// Delegate for handling keys/password setting during compresion/decompression.
+        ///     Delegate for handling keys/password setting during compresion/decompression.
         /// </summary>
         public delegate void KeysRequiredEventHandler(
             object sender,
@@ -362,36 +346,32 @@ namespace TidyBackups.SharpZipLib.Zip
             );
 
         /// <summary>
-        /// Event handler for handling encryption keys.
+        ///     Event handler for handling encryption keys.
         /// </summary>
         public KeysRequiredEventHandler KeysRequired;
 
         /// <summary>
-        /// Handles getting of encryption keys when required.
+        ///     Handles getting of encryption keys when required.
         /// </summary>
         /// <param name="fileName">The file for which encryption keys are required.</param>
         private void OnKeysRequired(string fileName)
         {
             if (KeysRequired != null)
             {
-                var krea = new KeysRequiredEventArgs(fileName, key);
+                var krea = new KeysRequiredEventArgs(fileName, Key);
                 KeysRequired(this, krea);
-                key = krea.Key;
+                Key = krea.Key;
             }
         }
 
         /// <summary>
-        /// Get/set the encryption key value.
+        ///     Get/set the encryption key value.
         /// </summary>
-        private byte[] Key
-        {
-            get { return key; }
-            set { key = value; }
-        }
+        private byte[] Key { get; set; }
 
 #if !NETCF_1_0
         /// <summary>
-        /// Password to be used for encrypting/decrypting files.
+        ///     Password to be used for encrypting/decrypting files.
         /// </summary>
         /// <remarks>Set to null if no password is required.</remarks>
         public string Password
@@ -400,22 +380,22 @@ namespace TidyBackups.SharpZipLib.Zip
             {
                 if ((value == null) || (value.Length == 0))
                 {
-                    key = null;
+                    Key = null;
                 }
                 else
                 {
-                    key = PkzipClassic.GenerateKeys(ZipConstants.ConvertToArray(value));
+                    Key = PkzipClassic.GenerateKeys(ZipConstants.ConvertToArray(value));
                 }
             }
         }
 #endif
 
         /// <summary>
-        /// Get a value indicating wether encryption keys are currently available.
+        ///     Get a value indicating wether encryption keys are currently available.
         /// </summary>
         private bool HaveKeys
         {
-            get { return key != null; }
+            get { return Key != null; }
         }
 
         #endregion
@@ -423,15 +403,15 @@ namespace TidyBackups.SharpZipLib.Zip
         #region Constructors
 
         /// <summary>
-        /// Opens a Zip file with the given name for reading.
+        ///     Opens a Zip file with the given name for reading.
         /// </summary>
         /// <param name="name">The name of the file to open.</param>
         /// <exception cref="ArgumentNullException">The argument supplied is null.</exception>
         /// <exception cref="IOException">
-        /// An i/o error occurs
+        ///     An i/o error occurs
         /// </exception>
         /// <exception cref="ZipException">
-        /// The file doesn't contain a valid zip archive.
+        ///     The file doesn't contain a valid zip archive.
         /// </exception>
         public ZipFile(string name)
         {
@@ -440,10 +420,10 @@ namespace TidyBackups.SharpZipLib.Zip
                 throw new ArgumentNullException("name");
             }
 
-            name_ = name;
+            Name = name;
 
-            baseStream_ = System.IO.File.OpenRead(name);
-            isStreamOwner = true;
+            baseStream_ = File.OpenRead(name);
+            IsStreamOwner = true;
 
             try
             {
@@ -457,15 +437,15 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Opens a Zip file reading the given <see cref="FileStream"/>.
+        ///     Opens a Zip file reading the given <see cref="FileStream" />.
         /// </summary>
-        /// <param name="file">The <see cref="FileStream"/> to read archive data from.</param>
+        /// <param name="file">The <see cref="FileStream" /> to read archive data from.</param>
         /// <exception cref="ArgumentNullException">The supplied argument is null.</exception>
         /// <exception cref="IOException">
-        /// An i/o error occurs.
+        ///     An i/o error occurs.
         /// </exception>
         /// <exception cref="ZipException">
-        /// The file doesn't contain a valid zip archive.
+        ///     The file doesn't contain a valid zip archive.
         /// </exception>
         public ZipFile(FileStream file)
         {
@@ -480,8 +460,8 @@ namespace TidyBackups.SharpZipLib.Zip
             }
 
             baseStream_ = file;
-            name_ = file.Name;
-            isStreamOwner = true;
+            Name = file.Name;
+            IsStreamOwner = true;
 
             try
             {
@@ -495,20 +475,20 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Opens a Zip file reading the given <see cref="Stream"/>.
+        ///     Opens a Zip file reading the given <see cref="Stream" />.
         /// </summary>
-        /// <param name="stream">The <see cref="Stream"/> to read archive data from.</param>
+        /// <param name="stream">The <see cref="Stream" /> to read archive data from.</param>
         /// <exception cref="IOException">
-        /// An i/o error occurs
+        ///     An i/o error occurs
         /// </exception>
         /// <exception cref="ZipException">
-        /// The stream doesn't contain a valid zip archive.<br/>
+        ///     The stream doesn't contain a valid zip archive.<br />
         /// </exception>
         /// <exception cref="ArgumentException">
-        /// The <see cref="Stream">stream</see> doesnt support seeking.
+        ///     The <see cref="Stream">stream</see> doesnt support seeking.
         /// </exception>
         /// <exception cref="ArgumentNullException">
-        /// The <see cref="Stream">stream</see> argument is null.
+        ///     The <see cref="Stream">stream</see> argument is null.
         /// </exception>
         public ZipFile(Stream stream)
         {
@@ -523,7 +503,7 @@ namespace TidyBackups.SharpZipLib.Zip
             }
 
             baseStream_ = stream;
-            isStreamOwner = true;
+            IsStreamOwner = true;
 
             if (baseStream_.Length > 0)
             {
@@ -540,17 +520,17 @@ namespace TidyBackups.SharpZipLib.Zip
             else
             {
                 entries_ = new ZipEntry[0];
-                isNewArchive_ = true;
+                IsNewArchive = true;
             }
         }
 
         /// <summary>
-        /// Initialises a default <see cref="ZipFile"/> instance with no entries and no file storage.
+        ///     Initialises a default <see cref="ZipFile" /> instance with no entries and no file storage.
         /// </summary>
         internal ZipFile()
         {
             entries_ = new ZipEntry[0];
-            isNewArchive_ = true;
+            IsNewArchive = true;
         }
 
         #endregion
@@ -558,7 +538,7 @@ namespace TidyBackups.SharpZipLib.Zip
         #region Destructors and Closing
 
         /// <summary>
-        /// Finalize this instance.
+        ///     Finalize this instance.
         /// </summary>
         ~ZipFile()
         {
@@ -566,11 +546,12 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Closes the ZipFile.  If the stream is <see cref="IsStreamOwner">owned</see> then this also closes the underlying input stream.
-        /// Once closed, no further instance methods should be called.
+        ///     Closes the ZipFile.  If the stream is <see cref="IsStreamOwner">owned</see> then this also closes the underlying
+        ///     input stream.
+        ///     Once closed, no further instance methods should be called.
         /// </summary>
         /// <exception cref="System.IO.IOException">
-        /// An i/o error occurs.
+        ///     An i/o error occurs.
         /// </exception>
         public void Close()
         {
@@ -583,10 +564,10 @@ namespace TidyBackups.SharpZipLib.Zip
         #region Creators
 
         /// <summary>
-        /// Create a new <see cref="ZipFile"/> whose data will be stored in a file.
+        ///     Create a new <see cref="ZipFile" /> whose data will be stored in a file.
         /// </summary>
         /// <param name="fileName">The name of the archive to create.</param>
-        /// <returns>Returns the newly created <see cref="ZipFile"/></returns>
+        /// <returns>Returns the newly created <see cref="ZipFile" /></returns>
         /// <exception cref="ArgumentNullException"><paramref name="fileName"></paramref> is null</exception>
         public static ZipFile Create(string fileName)
         {
@@ -595,22 +576,26 @@ namespace TidyBackups.SharpZipLib.Zip
                 throw new ArgumentNullException("fileName");
             }
 
-            FileStream fs = System.IO.File.Create(fileName);
+            var fs = File.Create(fileName);
 
             var result = new ZipFile();
-            result.name_ = fileName;
+            result.Name = fileName;
             result.baseStream_ = fs;
-            result.isStreamOwner = true;
+            result.IsStreamOwner = true;
             return result;
         }
 
         /// <summary>
-        /// Create a new <see cref="ZipFile"/> whose data will be stored on a stream.
+        ///     Create a new <see cref="ZipFile" /> whose data will be stored on a stream.
         /// </summary>
         /// <param name="outStream">The stream providing data storage.</param>
-        /// <returns>Returns the newly created <see cref="ZipFile"/></returns>
-        /// <exception cref="ArgumentNullException"><paramref name="outStream"> is null</paramref></exception>
-        /// <exception cref="ArgumentException"><paramref name="outStream"> doesnt support writing.</paramref></exception>
+        /// <returns>Returns the newly created <see cref="ZipFile" /></returns>
+        /// <exception cref="ArgumentNullException">
+        ///     <paramref name="outStream"> is null</paramref>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        ///     <paramref name="outStream"> doesnt support writing.</paramref>
+        /// </exception>
         public static ZipFile Create(Stream outStream)
         {
             if (outStream == null)
@@ -638,21 +623,17 @@ namespace TidyBackups.SharpZipLib.Zip
         #region Properties
 
         /// <summary>
-        /// Get/set a flag indicating if the underlying stream is owned by the ZipFile instance.
-        /// If the flag is true then the stream will be closed when <see cref="Close">Close</see> is called.
+        ///     Get/set a flag indicating if the underlying stream is owned by the ZipFile instance.
+        ///     If the flag is true then the stream will be closed when <see cref="Close">Close</see> is called.
         /// </summary>
         /// <remarks>
-        /// The default value is true in all cases.
+        ///     The default value is true in all cases.
         /// </remarks>
-        public bool IsStreamOwner
-        {
-            get { return isStreamOwner; }
-            set { isStreamOwner = value; }
-        }
+        public bool IsStreamOwner { get; set; }
 
         /// <summary>
-        /// Get a value indicating wether
-        /// this archive is embedded in another file or not.
+        ///     Get a value indicating wether
+        ///     this archive is embedded in another file or not.
         /// </summary>
         public bool IsEmbeddedArchive
         {
@@ -661,34 +642,25 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Get a value indicating that this archive is a new one.
+        ///     Get a value indicating that this archive is a new one.
         /// </summary>
-        public bool IsNewArchive
-        {
-            get { return isNewArchive_; }
-        }
+        public bool IsNewArchive { get; private set; }
 
         /// <summary>
-        /// Gets the comment for the zip file.
+        ///     Gets the comment for the zip file.
         /// </summary>
-        public string ZipFileComment
-        {
-            get { return comment_; }
-        }
+        public string ZipFileComment { get; private set; }
 
         /// <summary>
-        /// Gets the name of this zip file.
+        ///     Gets the name of this zip file.
         /// </summary>
-        public string Name
-        {
-            get { return name_; }
-        }
+        public string Name { get; private set; }
 
         /// <summary>
-        /// Gets the number of entries in this zip file.
+        ///     Gets the number of entries in this zip file.
         /// </summary>
         /// <exception cref="InvalidOperationException">
-        /// The Zip file has been closed.
+        ///     The Zip file has been closed.
         /// </exception>
         [Obsolete("Use the Count property instead")]
         public int Size
@@ -697,7 +669,7 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Get the number of entries contained in this <see cref="ZipFile"/>.
+        ///     Get the number of entries contained in this <see cref="ZipFile" />.
         /// </summary>
         public long Count
         {
@@ -705,7 +677,7 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Indexer property for ZipEntries
+        ///     Indexer property for ZipEntries
         /// </summary>
         [IndexerName("EntryByIndex")]
         public ZipEntry this[int index]
@@ -718,11 +690,11 @@ namespace TidyBackups.SharpZipLib.Zip
         #region Input Handling
 
         /// <summary>
-        /// Gets an enumerator for the Zip entries in this Zip file.
+        ///     Gets an enumerator for the Zip entries in this Zip file.
         /// </summary>
-        /// <returns>Returns an <see cref="IEnumerator"/> for this archive.</returns>
+        /// <returns>Returns an <see cref="IEnumerator" /> for this archive.</returns>
         /// <exception cref="ObjectDisposedException">
-        /// The Zip file has been closed.
+        ///     The Zip file has been closed.
         /// </exception>
         public IEnumerator GetEnumerator()
         {
@@ -735,13 +707,13 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Return the index of the entry with a matching name
+        ///     Return the index of the entry with a matching name
         /// </summary>
         /// <param name="name">Entry name to find</param>
         /// <param name="ignoreCase">If true the comparison is case insensitive</param>
         /// <returns>The index position of the matching entry or -1 if not found</returns>
         /// <exception cref="ObjectDisposedException">
-        /// The Zip file has been closed.
+        ///     The Zip file has been closed.
         /// </exception>
         public int FindEntry(string name, bool ignoreCase)
         {
@@ -751,7 +723,7 @@ namespace TidyBackups.SharpZipLib.Zip
             }
 
             // TODO: This will be slow as the next ice age for huge archives!
-            for (int i = 0; i < entries_.Length; i++)
+            for (var i = 0; i < entries_.Length; i++)
             {
                 if (string.Compare(name, entries_[i].Name, ignoreCase, CultureInfo.InvariantCulture) == 0)
                 {
@@ -762,17 +734,17 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Searches for a zip entry in this archive with the given name.
-        /// String comparisons are case insensitive
+        ///     Searches for a zip entry in this archive with the given name.
+        ///     String comparisons are case insensitive
         /// </summary>
         /// <param name="name">
-        /// The name to find. May contain directory components separated by slashes ('/').
+        ///     The name to find. May contain directory components separated by slashes ('/').
         /// </param>
         /// <returns>
-        /// A clone of the zip entry, or null if no entry with that name exists.
+        ///     A clone of the zip entry, or null if no entry with that name exists.
         /// </returns>
         /// <exception cref="ObjectDisposedException">
-        /// The Zip file has been closed.
+        ///     The Zip file has been closed.
         /// </exception>
         public ZipEntry GetEntry(string name)
         {
@@ -781,24 +753,24 @@ namespace TidyBackups.SharpZipLib.Zip
                 throw new ObjectDisposedException("ZipFile");
             }
 
-            int index = FindEntry(name, true);
+            var index = FindEntry(name, true);
             return (index >= 0) ? (ZipEntry) entries_[index].Clone() : null;
         }
 
         /// <summary>
-        /// Gets an input stream for reading the given zip entry data in an uncompressed form.
-        /// Normally the <see cref="ZipEntry"/> should be an entry returned by GetEntry().
+        ///     Gets an input stream for reading the given zip entry data in an uncompressed form.
+        ///     Normally the <see cref="ZipEntry" /> should be an entry returned by GetEntry().
         /// </summary>
-        /// <param name="entry">The <see cref="ZipEntry"/> to obtain a data <see cref="Stream"/> for</param>
-        /// <returns>An input <see cref="Stream"/> containing data for this <see cref="ZipEntry"/></returns>
+        /// <param name="entry">The <see cref="ZipEntry" /> to obtain a data <see cref="Stream" /> for</param>
+        /// <returns>An input <see cref="Stream" /> containing data for this <see cref="ZipEntry" /></returns>
         /// <exception cref="ObjectDisposedException">
-        /// The ZipFile has already been closed
+        ///     The ZipFile has already been closed
         /// </exception>
         /// <exception cref="SharpZipLib.Zip.ZipException">
-        /// The compression method for the entry is unknown
+        ///     The compression method for the entry is unknown
         /// </exception>
         /// <exception cref="IndexOutOfRangeException">
-        /// The entry is not found in the ZipFile
+        ///     The entry is not found in the ZipFile
         /// </exception>
         public Stream GetInputStream(ZipEntry entry)
         {
@@ -812,7 +784,7 @@ namespace TidyBackups.SharpZipLib.Zip
                 throw new ObjectDisposedException("ZipFile");
             }
 
-            long index = entry.ZipFileIndex;
+            var index = entry.ZipFileIndex;
             if ((index < 0) || (index >= entries_.Length) || (entries_[index].Name != entry.Name))
             {
                 index = FindEntry(entry.Name, true);
@@ -825,20 +797,20 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Creates an input stream reading a zip entry
+        ///     Creates an input stream reading a zip entry
         /// </summary>
         /// <param name="entryIndex">The index of the entry to obtain an input stream for.</param>
         /// <returns>
-        /// An input <see cref="Stream"/> containing data for this <paramref name="entryIndex"/>
+        ///     An input <see cref="Stream" /> containing data for this <paramref name="entryIndex" />
         /// </returns>
         /// <exception cref="ObjectDisposedException">
-        /// The ZipFile has already been closed
+        ///     The ZipFile has already been closed
         /// </exception>
         /// <exception cref="SharpZipLib.Zip.ZipException">
-        /// The compression method for the entry is unknown
+        ///     The compression method for the entry is unknown
         /// </exception>
         /// <exception cref="IndexOutOfRangeException">
-        /// The entry is not found in the ZipFile
+        ///     The entry is not found in the ZipFile
         /// </exception>
         public Stream GetInputStream(long entryIndex)
         {
@@ -847,8 +819,8 @@ namespace TidyBackups.SharpZipLib.Zip
                 throw new ObjectDisposedException("ZipFile");
             }
 
-            long start = LocateEntry(entries_[entryIndex]);
-            CompressionMethod method = entries_[entryIndex].CompressionMethod;
+            var start = LocateEntry(entries_[entryIndex]);
+            var method = entries_[entryIndex].CompressionMethod;
             Stream result = new PartialInputStream(this, start, entries_[entryIndex].CompressedSize);
 
             if (entries_[entryIndex].IsCrypted)
@@ -887,7 +859,7 @@ namespace TidyBackups.SharpZipLib.Zip
         #region Archive Testing
 
         /// <summary>
-        /// Test an archive for integrity/validity
+        ///     Test an archive for integrity/validity
         /// </summary>
         /// <param name="testData">Perform low level data Crc check</param>
         /// <returns>true if all tests pass, false otherwise</returns>
@@ -898,7 +870,7 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Test an archive for integrity/validity
+        ///     Test an archive for integrity/validity
         /// </summary>
         /// <param name="testData">Perform low level data Crc check</param>
         /// <param name="strategy">The <see cref="TestStrategy"></see> to apply.</param>
@@ -919,13 +891,13 @@ namespace TidyBackups.SharpZipLib.Zip
                 resultHandler(status, null);
             }
 
-            HeaderTest test = testData ? (HeaderTest.Header | HeaderTest.Extract) : HeaderTest.Header;
+            var test = testData ? (HeaderTest.Header | HeaderTest.Extract) : HeaderTest.Header;
 
-            bool testing = true;
+            var testing = true;
 
             try
             {
-                int entryIndex = 0;
+                var entryIndex = 0;
 
                 while (testing && (entryIndex < Count))
                 {
@@ -947,7 +919,7 @@ namespace TidyBackups.SharpZipLib.Zip
                         if (resultHandler != null)
                         {
                             resultHandler(status,
-                                          string.Format("Exception during test - '{0}'", ex.Message));
+                                string.Format("Exception during test - '{0}'", ex.Message));
                         }
 
                         if (strategy == TestStrategy.FindFirstError)
@@ -966,7 +938,7 @@ namespace TidyBackups.SharpZipLib.Zip
 
                         var crc = new Crc32();
 
-                        using (Stream entryStream = GetInputStream(this[entryIndex]))
+                        using (var entryStream = GetInputStream(this[entryIndex]))
                         {
                             var buffer = new byte[4096];
                             long totalBytes = 0;
@@ -1063,14 +1035,14 @@ namespace TidyBackups.SharpZipLib.Zip
         private enum HeaderTest
         {
             Extract = 0x01, // Check that this header represents an entry whose data can be extracted
-            Header = 0x02, // Check that this header contents are valid
+            Header = 0x02 // Check that this header contents are valid
         }
 
         /// <summary>
-        /// Test a local header against that provided from the central directory
+        ///     Test a local header against that provided from the central directory
         /// </summary>
         /// <param name="entry">
-        /// The entry to test against
+        ///     The entry to test against
         /// </param>
         /// <param name="tests">The type of <see cref="HeaderTest">tests</see> to carry out.</param>
         /// <returns>The offset of the entries data in the file</returns>
@@ -1078,14 +1050,14 @@ namespace TidyBackups.SharpZipLib.Zip
         {
             lock (baseStream_)
             {
-                bool testHeader = (tests & HeaderTest.Header) != 0;
-                bool testData = (tests & HeaderTest.Extract) != 0;
+                var testHeader = (tests & HeaderTest.Header) != 0;
+                var testData = (tests & HeaderTest.Extract) != 0;
 
                 baseStream_.Seek(offsetOfFirstEntry + entry.Offset, SeekOrigin.Begin);
                 if ((int) ReadLEUint() != ZipConstants.LocalHeaderSignature)
                 {
                     throw new ZipException(string.Format("Wrong local header signature @{0:X}",
-                                                         offsetOfFirstEntry + entry.Offset));
+                        offsetOfFirstEntry + entry.Offset));
                 }
 
                 var extractVersion = (short) ReadLEUshort();
@@ -1093,7 +1065,7 @@ namespace TidyBackups.SharpZipLib.Zip
                 var compressionMethod = (short) ReadLEUshort();
                 var fileTime = (short) ReadLEUshort();
                 var fileDate = (short) ReadLEUshort();
-                uint crcValue = ReadLEUint();
+                var crcValue = ReadLEUint();
                 long compressedSize = ReadLEUint();
                 long size = ReadLEUint();
                 int storedNameLength = ReadLEUshort();
@@ -1168,13 +1140,13 @@ namespace TidyBackups.SharpZipLib.Zip
                         {
                             throw new ZipException(
                                 string.Format("Version required to extract this entry not supported ({0})",
-                                              extractVersion));
+                                    extractVersion));
                         }
 
                         if ((localFlags &
                              (int)
-                             (GeneralBitFlags.Patched | GeneralBitFlags.StrongEncryption |
-                              GeneralBitFlags.EnhancedCompress | GeneralBitFlags.HeaderMasked)) != 0)
+                                 (GeneralBitFlags.Patched | GeneralBitFlags.StrongEncryption |
+                                  GeneralBitFlags.EnhancedCompress | GeneralBitFlags.HeaderMasked)) != 0)
                         {
                             throw new ZipException(
                                 "The library does not support the zip version required to extract this entry");
@@ -1202,14 +1174,14 @@ namespace TidyBackups.SharpZipLib.Zip
                         )
                     {
                         throw new ZipException(string.Format("Version required to extract this entry is invalid ({0})",
-                                                             extractVersion));
+                            extractVersion));
                     }
 
                     // Local entry flags dont have reserved bit set on.
                     if ((localFlags &
                          (int)
-                         (GeneralBitFlags.ReservedPKware4 | GeneralBitFlags.ReservedPkware14 |
-                          GeneralBitFlags.ReservedPkware15)) != 0)
+                             (GeneralBitFlags.ReservedPKware4 | GeneralBitFlags.ReservedPkware14 |
+                              GeneralBitFlags.ReservedPkware15)) != 0)
                     {
                         throw new ZipException("Reserved bit flags cannot be set.");
                     }
@@ -1219,7 +1191,7 @@ namespace TidyBackups.SharpZipLib.Zip
                     {
                         throw new ZipException(
                             string.Format("Version required to extract this entry is too low for encryption ({0})",
-                                          extractVersion));
+                                extractVersion));
                     }
 
                     // Strong encryption requires encryption flag to be set and extract version >= 50.
@@ -1234,7 +1206,7 @@ namespace TidyBackups.SharpZipLib.Zip
                         {
                             throw new ZipException(
                                 string.Format("Version required to extract this entry is too low for encryption ({0})",
-                                              extractVersion));
+                                    extractVersion));
                         }
                     }
 
@@ -1242,7 +1214,7 @@ namespace TidyBackups.SharpZipLib.Zip
                     if (((localFlags & (int) GeneralBitFlags.Patched) != 0) && (extractVersion < 27))
                     {
                         throw new ZipException(string.Format("Patched data requires higher version than ({0})",
-                                                             extractVersion));
+                            extractVersion));
                     }
 
                     // Central header flags match local entry flags.
@@ -1305,7 +1277,7 @@ namespace TidyBackups.SharpZipLib.Zip
                     }
 
                     // Name data has already been read convert it and compare.
-                    string localName = ZipConstants.ConvertToStringExt(localFlags, nameData);
+                    var localName = ZipConstants.ConvertToStringExt(localFlags, nameData);
 
                     // Central directory and local entry name match
                     if (localName != entry.Name)
@@ -1356,18 +1328,18 @@ namespace TidyBackups.SharpZipLib.Zip
                     {
                         throw new ZipException(
                             string.Format("Size mismatch between central header({0}) and local header({1})",
-                                          entry.Size, size));
+                                entry.Size, size));
                     }
 
                     if (compressedSize != entry.CompressedSize)
                     {
                         throw new ZipException(
                             string.Format("Compressed size mismatch between central header({0}) and local header({1})",
-                                          entry.CompressedSize, compressedSize));
+                                entry.CompressedSize, compressedSize));
                     }
                 }
 
-                int extraLength = storedNameLength + extraDataLength;
+                var extraLength = storedNameLength + extraDataLength;
                 return offsetOfFirstEntry + entry.Offset + ZipConstants.LocalHeaderBaseSize + extraLength;
             }
         }
@@ -1379,19 +1351,19 @@ namespace TidyBackups.SharpZipLib.Zip
         private const int DefaultBufferSize = 4096;
 
         /// <summary>
-        /// The kind of update to apply.
+        ///     The kind of update to apply.
         /// </summary>
         private enum UpdateCommand
         {
             Copy, // Copy original file contents.
             Modify, // Change encryption, compression, attributes, name, time etc, of an existing file.
-            Add, // Add a new file to the archive.
+            Add // Add a new file to the archive.
         }
 
         #region Properties
 
         /// <summary>
-        /// Get / set the <see cref="INameTransform"/> to apply to names when updating.
+        ///     Get / set the <see cref="INameTransform" /> to apply to names when updating.
         /// </summary>
         public INameTransform NameTransform
         {
@@ -1401,8 +1373,8 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Get/set the <see cref="IEntryFactory"/> used to generate <see cref="ZipEntry"/> values
-        /// during updates.
+        ///     Get/set the <see cref="IEntryFactory" /> used to generate <see cref="ZipEntry" /> values
+        ///     during updates.
         /// </summary>
         public IEntryFactory EntryFactory
         {
@@ -1422,7 +1394,7 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Get /set the buffer size to be used when updating this zip file.
+        ///     Get /set the buffer size to be used when updating this zip file.
         /// </summary>
         public int BufferSize
         {
@@ -1447,7 +1419,7 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Get a value indicating an update has <see cref="BeginUpdate()">been started</see>.
+        ///     Get a value indicating an update has <see cref="BeginUpdate()">been started</see>.
         /// </summary>
         public bool IsUpdating
         {
@@ -1455,7 +1427,7 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Get / set a value indicating how Zip64 Extension usage is determined when adding entries.
+        ///     Get / set a value indicating how Zip64 Extension usage is determined when adding entries.
         /// </summary>
         public UseZip64 UseZip64
         {
@@ -1482,7 +1454,7 @@ namespace TidyBackups.SharpZipLib.Zip
         #region Deferred Updating
 
         /// <summary>
-        /// Begin updating this <see cref="ZipFile"/> archive.
+        ///     Begin updating this <see cref="ZipFile" /> archive.
         /// </summary>
         /// <param name="archiveStorage">The <see cref="IArchiveStorage">archive storage</see> for use during the update.</param>
         /// <param name="dataSource">The <see cref="IDynamicDataSource">data source</see> to utilise during updating.</param>
@@ -1519,9 +1491,9 @@ namespace TidyBackups.SharpZipLib.Zip
             updateIndex_ = new Hashtable();
 
             updates_ = new ArrayList(entries_.Length);
-            foreach (ZipEntry entry in entries_)
+            foreach (var entry in entries_)
             {
-                int index = updates_.Add(new ZipUpdate(entry));
+                var index = updates_.Add(new ZipUpdate(entry));
                 updateIndex_.Add(entry.Name, index);
             }
 
@@ -1533,7 +1505,7 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Begin updating to this <see cref="ZipFile"/> archive.
+        ///     Begin updating to this <see cref="ZipFile" /> archive.
         /// </summary>
         /// <param name="archiveStorage">The storage to use during the update.</param>
         public void BeginUpdate(IArchiveStorage archiveStorage)
@@ -1542,9 +1514,9 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Begin updating this <see cref="ZipFile"/> archive.
+        ///     Begin updating this <see cref="ZipFile" /> archive.
         /// </summary>
-        /// <seealso cref="BeginUpdate(IArchiveStorage)"/>
+        /// <seealso cref="BeginUpdate(IArchiveStorage)" />
         /// <seealso cref="CommitUpdate"></seealso>
         /// <seealso cref="AbortUpdate"></seealso>
         public void BeginUpdate()
@@ -1560,7 +1532,7 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Commit current updates, updating this archive.
+        ///     Commit current updates, updating this archive.
         /// </summary>
         /// <seealso cref="BeginUpdate()"></seealso>
         /// <seealso cref="AbortUpdate"></seealso>
@@ -1592,9 +1564,9 @@ namespace TidyBackups.SharpZipLib.Zip
                     // Create an empty archive if none existed originally.
                     if (entries_.Length == 0)
                     {
-                        byte[] theComment = (newComment_ != null)
-                                                ? newComment_.RawComment
-                                                : ZipConstants.ConvertToArray(comment_);
+                        var theComment = (newComment_ != null)
+                            ? newComment_.RawComment
+                            : ZipConstants.ConvertToArray(ZipFileComment);
                         using (var zhs = new ZipHelperStream(baseStream_))
                         {
                             zhs.WriteEndOfCentralDirectory(0, 0, 0, theComment);
@@ -1609,7 +1581,7 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Abort updating leaving the archive unchanged.
+        ///     Abort updating leaving the archive unchanged.
         /// </summary>
         /// <seealso cref="BeginUpdate()"></seealso>
         /// <seealso cref="CommitUpdate"></seealso>
@@ -1619,7 +1591,7 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Set the file comment to be recorded when the current update is <see cref="CommitUpdate">commited</see>.
+        ///     Set the file comment to be recorded when the current update is <see cref="CommitUpdate">commited</see>.
         /// </summary>
         /// <param name="comment">The comment to record.</param>
         /// <exception cref="ObjectDisposedException">ZipFile has been closed.</exception>
@@ -1653,7 +1625,7 @@ namespace TidyBackups.SharpZipLib.Zip
         {
             contentsEdited_ = true;
 
-            int index = FindExistingUpdate(update.Entry.Name);
+            var index = FindExistingUpdate(update.Entry.Name);
 
             if (index >= 0)
             {
@@ -1674,7 +1646,7 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Add a new entry to the archive.
+        ///     Add a new entry to the archive.
         /// </summary>
         /// <param name="fileName">The name of the file to add.</param>
         /// <param name="compressionMethod">The compression method to use.</param>
@@ -1702,7 +1674,7 @@ namespace TidyBackups.SharpZipLib.Zip
             CheckUpdating();
             contentsEdited_ = true;
 
-            ZipEntry entry = EntryFactory.MakeFileEntry(fileName);
+            var entry = EntryFactory.MakeFileEntry(fileName);
             entry.IsUnicodeText = useUnicodeText;
             entry.CompressionMethod = compressionMethod;
 
@@ -1710,7 +1682,7 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Add a new entry to the archive.
+        ///     Add a new entry to the archive.
         /// </summary>
         /// <param name="fileName">The name of the file to add.</param>
         /// <param name="compressionMethod">The compression method to use.</param>
@@ -1731,13 +1703,13 @@ namespace TidyBackups.SharpZipLib.Zip
             CheckUpdating();
             contentsEdited_ = true;
 
-            ZipEntry entry = EntryFactory.MakeFileEntry(fileName);
+            var entry = EntryFactory.MakeFileEntry(fileName);
             entry.CompressionMethod = compressionMethod;
             AddUpdate(new ZipUpdate(fileName, entry));
         }
 
         /// <summary>
-        /// Add a file to the archive.
+        ///     Add a file to the archive.
         /// </summary>
         /// <param name="fileName">The name of the file to add.</param>
         /// <exception cref="ArgumentNullException">Argument supplied is null.</exception>
@@ -1753,10 +1725,10 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Add a file to the archive.
+        ///     Add a file to the archive.
         /// </summary>
         /// <param name="fileName">The name of the file to add.</param>
-        /// <param name="entryName">The name to use for the <see cref="ZipEntry"/> on the Zip file created.</param>
+        /// <param name="entryName">The name to use for the <see cref="ZipEntry" /> on the Zip file created.</param>
         /// <exception cref="ArgumentNullException">Argument supplied is null.</exception>
         public void Add(string fileName, string entryName)
         {
@@ -1776,7 +1748,7 @@ namespace TidyBackups.SharpZipLib.Zip
 
 
         /// <summary>
-        /// Add a file entry with data.
+        ///     Add a file entry with data.
         /// </summary>
         /// <param name="dataSource">The source of the data for this entry.</param>
         /// <param name="entryName">The name to give to the entry.</param>
@@ -1797,7 +1769,7 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Add a file entry with data.
+        ///     Add a file entry with data.
         /// </summary>
         /// <param name="dataSource">The source of the data for this entry.</param>
         /// <param name="entryName">The name to give to the entry.</param>
@@ -1816,21 +1788,21 @@ namespace TidyBackups.SharpZipLib.Zip
 
             CheckUpdating();
 
-            ZipEntry entry = EntryFactory.MakeFileEntry(entryName, false);
+            var entry = EntryFactory.MakeFileEntry(entryName, false);
             entry.CompressionMethod = compressionMethod;
 
             AddUpdate(new ZipUpdate(dataSource, entry));
         }
 
         /// <summary>
-        /// Add a file entry with data.
+        ///     Add a file entry with data.
         /// </summary>
         /// <param name="dataSource">The source of the data for this entry.</param>
         /// <param name="entryName">The name to give to the entry.</param>
         /// <param name="compressionMethod">The compression method to use.</param>
         /// <param name="useUnicodeText">Ensure Unicode text is used for name and comments for this entry.</param>
         public void Add(IStaticDataSource dataSource, string entryName, CompressionMethod compressionMethod,
-                        bool useUnicodeText)
+            bool useUnicodeText)
         {
             if (dataSource == null)
             {
@@ -1844,7 +1816,7 @@ namespace TidyBackups.SharpZipLib.Zip
 
             CheckUpdating();
 
-            ZipEntry entry = EntryFactory.MakeFileEntry(entryName, false);
+            var entry = EntryFactory.MakeFileEntry(entryName, false);
             entry.IsUnicodeText = useUnicodeText;
             entry.CompressionMethod = compressionMethod;
 
@@ -1852,7 +1824,7 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Add a <see cref="ZipEntry"/> that contains no data.
+        ///     Add a <see cref="ZipEntry" /> that contains no data.
         /// </summary>
         /// <param name="entry">The entry to add.</param>
         /// <remarks>This can be used to add directories, volume labels, or empty file entries.</remarks>
@@ -1874,7 +1846,7 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Add a directory entry to the archive.
+        ///     Add a directory entry to the archive.
         /// </summary>
         /// <param name="directoryName">The directory to add.</param>
         public void AddDirectory(string directoryName)
@@ -1886,7 +1858,7 @@ namespace TidyBackups.SharpZipLib.Zip
 
             CheckUpdating();
 
-            ZipEntry dirEntry = EntryFactory.MakeDirectoryEntry(directoryName);
+            var dirEntry = EntryFactory.MakeDirectoryEntry(directoryName);
             AddUpdate(new ZipUpdate(UpdateCommand.Add, dirEntry));
         }
 
@@ -1918,7 +1890,7 @@ namespace TidyBackups.SharpZipLib.Zip
         #region Deleting Entries
 
         /// <summary>
-        /// Delete an entry by name
+        ///     Delete an entry by name
         /// </summary>
         /// <param name="fileName">The filename to delete</param>
         /// <returns>True if the entry was found and deleted; false otherwise.</returns>
@@ -1931,8 +1903,8 @@ namespace TidyBackups.SharpZipLib.Zip
 
             CheckUpdating();
 
-            bool result = false;
-            int index = FindExistingUpdate(fileName);
+            var result = false;
+            var index = FindExistingUpdate(fileName);
             if ((index >= 0) && (updates_[index] != null))
             {
                 result = true;
@@ -1948,7 +1920,7 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Delete a <see cref="ZipEntry"/> from the archive.
+        ///     Delete a <see cref="ZipEntry" /> from the archive.
         /// </summary>
         /// <param name="entry">The entry to delete.</param>
         public void Delete(ZipEntry entry)
@@ -1960,7 +1932,7 @@ namespace TidyBackups.SharpZipLib.Zip
 
             CheckUpdating();
 
-            int index = FindExistingUpdate(entry);
+            var index = FindExistingUpdate(entry);
             if (index >= 0)
             {
                 contentsEdited_ = true;
@@ -1986,7 +1958,7 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Write an unsigned short in little endian byte order.
+        ///     Write an unsigned short in little endian byte order.
         /// </summary>
         private void WriteLEUshort(ushort value)
         {
@@ -1995,7 +1967,7 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Write an int in little endian byte order.
+        ///     Write an int in little endian byte order.
         /// </summary>
         private void WriteLEInt(int value)
         {
@@ -2004,7 +1976,7 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Write an unsigned int in little endian byte order.
+        ///     Write an unsigned int in little endian byte order.
         /// </summary>
         private void WriteLEUint(uint value)
         {
@@ -2013,7 +1985,7 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Write a long in little endian byte order.
+        ///     Write a long in little endian byte order.
         /// </summary>
         private void WriteLeLong(long value)
         {
@@ -2029,7 +2001,7 @@ namespace TidyBackups.SharpZipLib.Zip
 
         private void WriteLocalEntryHeader(ZipUpdate update)
         {
-            ZipEntry entry = update.OutEntry;
+            var entry = update.OutEntry;
 
             // TODO: Local offset will require adjusting for multi-disk zip files.
             entry.Offset = baseStream_.Position;
@@ -2120,7 +2092,7 @@ namespace TidyBackups.SharpZipLib.Zip
                 WriteLEInt((int) entry.Size);
             }
 
-            byte[] name = ZipConstants.ConvertToArray(entry.Flags, entry.Name);
+            var name = ZipConstants.ConvertToArray(entry.Flags, entry.Name);
 
             if (name.Length > 0xFFFF)
             {
@@ -2223,7 +2195,7 @@ namespace TidyBackups.SharpZipLib.Zip
                 WriteLEInt((int) entry.Size);
             }
 
-            byte[] name = ZipConstants.ConvertToArray(entry.Flags, entry.Name);
+            var name = ZipConstants.ConvertToArray(entry.Flags, entry.Name);
 
             if (name.Length > 0xFFFF)
             {
@@ -2263,7 +2235,7 @@ namespace TidyBackups.SharpZipLib.Zip
                 ed.Delete(1);
             }
 
-            byte[] centralExtraData = ed.GetEntryData();
+            var centralExtraData = ed.GetEntryData();
 
             WriteLEShort(centralExtraData.Length);
             WriteLEShort(entry.Comment != null ? entry.Comment.Length : 0);
@@ -2307,7 +2279,7 @@ namespace TidyBackups.SharpZipLib.Zip
                 baseStream_.Write(centralExtraData, 0, centralExtraData.Length);
             }
 
-            byte[] rawComment = (entry.Comment != null) ? Encoding.ASCII.GetBytes(entry.Comment) : new byte[0];
+            var rawComment = (entry.Comment != null) ? Encoding.ASCII.GetBytes(entry.Comment) : new byte[0];
 
             if (rawComment.Length > 0)
             {
@@ -2335,19 +2307,19 @@ namespace TidyBackups.SharpZipLib.Zip
         private string GetTransformedFileName(string name)
         {
             return (NameTransform != null)
-                       ? NameTransform.TransformFile(name)
-                       : name;
+                ? NameTransform.TransformFile(name)
+                : name;
         }
 
         private string GetTransformedDirectoryName(string name)
         {
             return (NameTransform != null)
-                       ? NameTransform.TransformDirectory(name)
-                       : name;
+                ? NameTransform.TransformDirectory(name)
+                : name;
         }
 
         /// <summary>
-        /// Get a raw memory buffer.
+        ///     Get a raw memory buffer.
         /// </summary>
         /// <returns>Returns a raw memory buffer.</returns>
         private byte[] GetBuffer()
@@ -2361,17 +2333,17 @@ namespace TidyBackups.SharpZipLib.Zip
 
         private void CopyDescriptorBytes(ZipUpdate update, Stream dest, Stream source)
         {
-            int bytesToCopy = GetDescriptorSize(update);
+            var bytesToCopy = GetDescriptorSize(update);
 
             if (bytesToCopy > 0)
             {
-                byte[] buffer = GetBuffer();
+                var buffer = GetBuffer();
 
                 while (bytesToCopy > 0)
                 {
-                    int readSize = Math.Min(buffer.Length, bytesToCopy);
+                    var readSize = Math.Min(buffer.Length, bytesToCopy);
 
-                    int bytesRead = source.Read(buffer, 0, readSize);
+                    var bytesRead = source.Read(buffer, 0, readSize);
                     if (bytesRead > 0)
                     {
                         dest.Write(buffer, 0, bytesRead);
@@ -2386,7 +2358,7 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         private void CopyBytes(ZipUpdate update, Stream destination, Stream source,
-                               long bytesToCopy, bool updateCrc)
+            long bytesToCopy, bool updateCrc)
         {
             if (destination == source)
             {
@@ -2395,15 +2367,15 @@ namespace TidyBackups.SharpZipLib.Zip
 
             // NOTE: Compressed size is updated elsewhere.
             var crc = new Crc32();
-            byte[] buffer = GetBuffer();
+            var buffer = GetBuffer();
 
-            long targetBytes = bytesToCopy;
+            var targetBytes = bytesToCopy;
             long totalBytesRead = 0;
 
             int bytesRead;
             do
             {
-                int readSize = buffer.Length;
+                var readSize = buffer.Length;
 
                 if (bytesToCopy < readSize)
                 {
@@ -2426,7 +2398,7 @@ namespace TidyBackups.SharpZipLib.Zip
             if (totalBytesRead != targetBytes)
             {
                 throw new ZipException(string.Format("Failed to copy bytes expected {0} read {1}", targetBytes,
-                                                     totalBytesRead));
+                    totalBytesRead));
             }
 
             if (updateCrc)
@@ -2436,13 +2408,13 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Get the size of the source descriptor for a <see cref="ZipUpdate"/>.
+        ///     Get the size of the source descriptor for a <see cref="ZipUpdate" />.
         /// </summary>
         /// <param name="update">The update to get the size for.</param>
         /// <returns>The descriptor size, zero if there isnt one.</returns>
         private int GetDescriptorSize(ZipUpdate update)
         {
-            int result = 0;
+            var result = 0;
             if ((update.Entry.Flags & (int) GeneralBitFlags.Descriptor) != 0)
             {
                 result = ZipConstants.DataDescriptorSize - 4;
@@ -2455,17 +2427,17 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         private void CopyDescriptorBytesDirect(ZipUpdate update, Stream stream, ref long destinationPosition,
-                                               long sourcePosition)
+            long sourcePosition)
         {
-            int bytesToCopy = GetDescriptorSize(update);
+            var bytesToCopy = GetDescriptorSize(update);
 
             while (bytesToCopy > 0)
             {
-                int readSize = bytesToCopy;
-                byte[] buffer = GetBuffer();
+                var readSize = bytesToCopy;
+                var buffer = GetBuffer();
 
                 stream.Position = sourcePosition;
-                int bytesRead = stream.Read(buffer, 0, readSize);
+                var bytesRead = stream.Read(buffer, 0, readSize);
                 if (bytesRead > 0)
                 {
                     stream.Position = destinationPosition;
@@ -2482,21 +2454,21 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         private void CopyEntryDataDirect(ZipUpdate update, Stream stream, bool updateCrc, ref long destinationPosition,
-                                         ref long sourcePosition)
+            ref long sourcePosition)
         {
-            long bytesToCopy = update.Entry.CompressedSize;
+            var bytesToCopy = update.Entry.CompressedSize;
 
             // NOTE: Compressed size is updated elsewhere.
             var crc = new Crc32();
-            byte[] buffer = GetBuffer();
+            var buffer = GetBuffer();
 
-            long targetBytes = bytesToCopy;
+            var targetBytes = bytesToCopy;
             long totalBytesRead = 0;
 
             int bytesRead;
             do
             {
-                int readSize = buffer.Length;
+                var readSize = buffer.Length;
 
                 if (bytesToCopy < readSize)
                 {
@@ -2524,7 +2496,7 @@ namespace TidyBackups.SharpZipLib.Zip
             if (totalBytesRead != targetBytes)
             {
                 throw new ZipException(string.Format("Failed to copy bytes expected {0} read {1}", targetBytes,
-                                                     totalBytesRead));
+                    totalBytesRead));
             }
 
             if (updateCrc)
@@ -2535,8 +2507,8 @@ namespace TidyBackups.SharpZipLib.Zip
 
         private int FindExistingUpdate(ZipEntry entry)
         {
-            int result = -1;
-            string convertedName = GetTransformedFileName(entry.Name);
+            var result = -1;
+            var convertedName = GetTransformedFileName(entry.Name);
 
             if (updateIndex_.ContainsKey(convertedName))
             {
@@ -2560,9 +2532,9 @@ namespace TidyBackups.SharpZipLib.Zip
 
         private int FindExistingUpdate(string fileName)
         {
-            int result = -1;
+            var result = -1;
 
-            string convertedName = GetTransformedFileName(fileName);
+            var convertedName = GetTransformedFileName(fileName);
 
             if (updateIndex_.ContainsKey(convertedName))
             {
@@ -2585,13 +2557,13 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Get an output stream for the specified <see cref="ZipEntry"/>
+        ///     Get an output stream for the specified <see cref="ZipEntry" />
         /// </summary>
         /// <param name="entry">The entry to get an output stream for.</param>
         /// <returns>The output stream obtained for the entry.</returns>
         private Stream GetOutputStream(ZipEntry entry)
         {
-            Stream result = baseStream_;
+            var result = baseStream_;
 
             if (entry.IsCrypted)
             {
@@ -2638,7 +2610,7 @@ namespace TidyBackups.SharpZipLib.Zip
             {
                 using (source)
                 {
-                    long sourceStreamLength = source.Length;
+                    var sourceStreamLength = source.Length;
                     if (update.OutEntry.Size < 0)
                     {
                         update.OutEntry.Size = sourceStreamLength;
@@ -2654,14 +2626,14 @@ namespace TidyBackups.SharpZipLib.Zip
 
                     workFile.WriteLocalEntryHeader(update);
 
-                    long dataStart = workFile.baseStream_.Position;
+                    var dataStart = workFile.baseStream_.Position;
 
-                    using (Stream output = workFile.GetOutputStream(update.OutEntry))
+                    using (var output = workFile.GetOutputStream(update.OutEntry))
                     {
                         CopyBytes(update, output, source, sourceStreamLength, true);
                     }
 
-                    long dataEnd = workFile.baseStream_.Position;
+                    var dataEnd = workFile.baseStream_.Position;
                     update.OutEntry.CompressedSize = dataEnd - dataStart;
 
                     if ((update.OutEntry.Flags & (int) GeneralBitFlags.Descriptor) == (int) GeneralBitFlags.Descriptor)
@@ -2681,27 +2653,27 @@ namespace TidyBackups.SharpZipLib.Zip
         private void ModifyEntry(ZipFile workFile, ZipUpdate update)
         {
             workFile.WriteLocalEntryHeader(update);
-            long dataStart = workFile.baseStream_.Position;
+            var dataStart = workFile.baseStream_.Position;
 
             // TODO: This is slow if the changes don't effect the data!!
             if (update.Entry.IsFile && (update.Filename != null))
             {
-                using (Stream output = workFile.GetOutputStream(update.OutEntry))
+                using (var output = workFile.GetOutputStream(update.OutEntry))
                 {
-                    using (Stream source = GetInputStream(update.Entry))
+                    using (var source = GetInputStream(update.Entry))
                     {
                         CopyBytes(update, output, source, source.Length, true);
                     }
                 }
             }
 
-            long dataEnd = workFile.baseStream_.Position;
+            var dataEnd = workFile.baseStream_.Position;
             update.Entry.CompressedSize = dataEnd - dataStart;
         }
 
         private void CopyEntryDirect(ZipFile workFile, ZipUpdate update, ref long destinationPosition)
         {
-            bool skipOver = false;
+            var skipOver = false;
             if (update.Entry.Offset == destinationPosition)
             {
                 skipOver = true;
@@ -2719,7 +2691,7 @@ namespace TidyBackups.SharpZipLib.Zip
             const int NameLengthOffset = 26;
 
             // TODO: Add base for SFX friendly handling
-            long entryDataOffset = update.Entry.Offset + NameLengthOffset;
+            var entryDataOffset = update.Entry.Offset + NameLengthOffset;
 
             baseStream_.Seek(entryDataOffset, SeekOrigin.Begin);
 
@@ -2754,7 +2726,7 @@ namespace TidyBackups.SharpZipLib.Zip
             {
                 const int NameLengthOffset = 26;
 
-                long entryDataOffset = update.Entry.Offset + NameLengthOffset;
+                var entryDataOffset = update.Entry.Offset + NameLengthOffset;
 
                 // TODO: This wont work for SFX files!
                 baseStream_.Seek(entryDataOffset, SeekOrigin.Begin);
@@ -2776,7 +2748,7 @@ namespace TidyBackups.SharpZipLib.Zip
                 throw new ZipException("Failed to reopen archive - no source");
             }
 
-            isNewArchive_ = false;
+            IsNewArchive = false;
             baseStream_ = source;
             ReadEntries();
         }
@@ -2788,18 +2760,18 @@ namespace TidyBackups.SharpZipLib.Zip
                 throw new InvalidOperationException("Name is not known cannot Reopen");
             }
 
-            Reopen(System.IO.File.OpenRead(Name));
+            Reopen(File.OpenRead(Name));
         }
 
         private void UpdateCommentOnly()
         {
-            long baseLength = baseStream_.Length;
+            var baseLength = baseStream_.Length;
 
             ZipHelperStream updateFile = null;
 
             if (archiveStorage_.UpdateMode == FileUpdateMode.Safe)
             {
-                Stream copyStream = archiveStorage_.MakeTemporaryCopy(baseStream_);
+                var copyStream = archiveStorage_.MakeTemporaryCopy(baseStream_);
                 updateFile = new ZipHelperStream(copyStream);
                 updateFile.IsStreamOwner = true;
 
@@ -2830,9 +2802,9 @@ namespace TidyBackups.SharpZipLib.Zip
 
             using (updateFile)
             {
-                long locatedCentralDirOffset =
+                var locatedCentralDirOffset =
                     updateFile.LocateBlockWithSignature(ZipConstants.EndOfCentralDirectorySignature,
-                                                        baseLength, ZipConstants.EndOfCentralRecordBaseSize, 0xffff);
+                        baseLength, ZipConstants.EndOfCentralRecordBaseSize, 0xffff);
                 if (locatedCentralDirOffset < 0)
                 {
                     throw new ZipException("Cannot find central directory");
@@ -2841,7 +2813,7 @@ namespace TidyBackups.SharpZipLib.Zip
                 const int CentralHeaderCommentSizeOffset = 16;
                 updateFile.Position += CentralHeaderCommentSizeOffset;
 
-                byte[] rawComment = newComment_.RawComment;
+                var rawComment = newComment_.RawComment;
 
                 updateFile.WriteLEShort(rawComment.Length);
                 updateFile.Write(rawComment, 0, rawComment.Length);
@@ -2859,15 +2831,15 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Class used to sort updates.
+        ///     Class used to sort updates.
         /// </summary>
         private class UpdateComparer : IComparer
         {
             #region IComparer Members
 
             /// <summary>
-            /// Compares two objects and returns a value indicating whether one is 
-            /// less than, equal to or greater than the other.
+            ///     Compares two objects and returns a value indicating whether one is
+            ///     less than, equal to or greater than the other.
             /// </summary>
             /// <param name="x">First object to compare</param>
             /// <param name="y">Second object to compare.</param>
@@ -2898,13 +2870,13 @@ namespace TidyBackups.SharpZipLib.Zip
                 }
                 else
                 {
-                    int xCmdValue = ((zx.Command == UpdateCommand.Copy) || (zx.Command == UpdateCommand.Modify)) ? 0 : 1;
-                    int yCmdValue = ((zy.Command == UpdateCommand.Copy) || (zy.Command == UpdateCommand.Modify)) ? 0 : 1;
+                    var xCmdValue = ((zx.Command == UpdateCommand.Copy) || (zx.Command == UpdateCommand.Modify)) ? 0 : 1;
+                    var yCmdValue = ((zy.Command == UpdateCommand.Copy) || (zy.Command == UpdateCommand.Modify)) ? 0 : 1;
 
                     result = xCmdValue - yCmdValue;
                     if (result == 0)
                     {
-                        long offsetDiff = zx.Entry.Offset - zy.Entry.Offset;
+                        var offsetDiff = zx.Entry.Offset - zy.Entry.Offset;
                         if (offsetDiff < 0)
                         {
                             result = -1;
@@ -2929,8 +2901,8 @@ namespace TidyBackups.SharpZipLib.Zip
         {
             long sizeEntries = 0;
             long endOfStream = 0;
-            bool allOk = true;
-            bool directUpdate = false;
+            var allOk = true;
+            var directUpdate = false;
             long destinationPosition = 0; // NOT SFX friendly
 
             ZipFile workFile;
@@ -2956,9 +2928,9 @@ namespace TidyBackups.SharpZipLib.Zip
                 workFile = Create(archiveStorage_.GetTemporaryOutput());
                 workFile.UseZip64 = UseZip64;
 
-                if (key != null)
+                if (Key != null)
                 {
-                    workFile.key = (byte[]) key.Clone();
+                    workFile.Key = (byte[]) Key.Clone();
                 }
             }
 
@@ -3008,7 +2980,7 @@ namespace TidyBackups.SharpZipLib.Zip
                     workFile.baseStream_.Position = destinationPosition;
                 }
 
-                long centralDirOffset = workFile.baseStream_.Position;
+                var centralDirOffset = workFile.baseStream_.Position;
 
                 foreach (ZipUpdate update in updates_)
                 {
@@ -3018,9 +2990,9 @@ namespace TidyBackups.SharpZipLib.Zip
                     }
                 }
 
-                byte[] theComment = (newComment_ != null)
-                                        ? newComment_.RawComment
-                                        : ZipConstants.ConvertToArray(comment_);
+                var theComment = (newComment_ != null)
+                    ? newComment_.RawComment
+                    : ZipConstants.ConvertToArray(ZipFileComment);
                 using (var zhs = new ZipHelperStream(workFile.baseStream_))
                 {
                     zhs.WriteEndOfCentralDirectory(updateCount_, sizeEntries, centralDirOffset, theComment);
@@ -3082,7 +3054,7 @@ namespace TidyBackups.SharpZipLib.Zip
             {
                 if (directUpdate)
                 {
-                    isNewArchive_ = false;
+                    IsNewArchive = false;
                     workFile.baseStream_.Flush();
                     ReadEntries();
                 }
@@ -3097,7 +3069,7 @@ namespace TidyBackups.SharpZipLib.Zip
                 workFile.Close();
                 if (!directUpdate && (workFile.Name != null))
                 {
-                    System.IO.File.Delete(workFile.Name);
+                    File.Delete(workFile.Name);
                 }
             }
         }
@@ -3115,10 +3087,80 @@ namespace TidyBackups.SharpZipLib.Zip
         #region ZipUpdate class
 
         /// <summary>
-        /// Represents a pending update to a Zip file.
+        ///     Represents a pending update to a Zip file.
         /// </summary>
         private class ZipUpdate
         {
+            /// <summary>
+            ///     Get the <see cref="ZipEntry" /> for this update.
+            /// </summary>
+            /// <remarks>This is the source or original entry.</remarks>
+            public ZipEntry Entry
+            {
+                get { return entry_; }
+            }
+
+            /// <summary>
+            ///     Get the <see cref="ZipEntry" /> that will be written to the updated/new file.
+            /// </summary>
+            public ZipEntry OutEntry
+            {
+                get
+                {
+                    if (outEntry_ == null)
+                    {
+                        outEntry_ = (ZipEntry) entry_.Clone();
+                    }
+
+                    return outEntry_;
+                }
+            }
+
+            /// <summary>
+            ///     Get the command for this update.
+            /// </summary>
+            public UpdateCommand Command
+            {
+                get { return command_; }
+            }
+
+            /// <summary>
+            ///     Get the filename if any for this update.  Null if none exists.
+            /// </summary>
+            public string Filename
+            {
+                get { return filename_; }
+            }
+
+            /// <summary>
+            ///     Get/set the location of the size patch for this update.
+            /// </summary>
+            public long SizePatchOffset
+            {
+                get { return sizePatchOffset_; }
+                set { sizePatchOffset_ = value; }
+            }
+
+            /// <summary>
+            ///     Get /set the location of the crc patch for this update.
+            /// </summary>
+            public long CrcPatchOffset
+            {
+                get { return crcPatchOffset_; }
+                set { crcPatchOffset_ = value; }
+            }
+
+            public Stream GetSource()
+            {
+                Stream result = null;
+                if (dataSource_ != null)
+                {
+                    result = dataSource_.GetSource();
+                }
+
+                return result;
+            }
+
             #region Constructors
 
             public ZipUpdate(string fileName, ZipEntry entry)
@@ -3178,7 +3220,7 @@ namespace TidyBackups.SharpZipLib.Zip
 
 
             /// <summary>
-            /// Copy an existing entry.
+            ///     Copy an existing entry.
             /// </summary>
             /// <param name="entry">The existing entry to copy.</param>
             public ZipUpdate(ZipEntry entry)
@@ -3188,76 +3230,6 @@ namespace TidyBackups.SharpZipLib.Zip
             }
 
             #endregion
-
-            /// <summary>
-            /// Get the <see cref="ZipEntry"/> for this update.
-            /// </summary>
-            /// <remarks>This is the source or original entry.</remarks>
-            public ZipEntry Entry
-            {
-                get { return entry_; }
-            }
-
-            /// <summary>
-            /// Get the <see cref="ZipEntry"/> that will be written to the updated/new file.
-            /// </summary>
-            public ZipEntry OutEntry
-            {
-                get
-                {
-                    if (outEntry_ == null)
-                    {
-                        outEntry_ = (ZipEntry) entry_.Clone();
-                    }
-
-                    return outEntry_;
-                }
-            }
-
-            /// <summary>
-            /// Get the command for this update.
-            /// </summary>
-            public UpdateCommand Command
-            {
-                get { return command_; }
-            }
-
-            /// <summary>
-            /// Get the filename if any for this update.  Null if none exists.
-            /// </summary>
-            public string Filename
-            {
-                get { return filename_; }
-            }
-
-            /// <summary>
-            /// Get/set the location of the size patch for this update.
-            /// </summary>
-            public long SizePatchOffset
-            {
-                get { return sizePatchOffset_; }
-                set { sizePatchOffset_ = value; }
-            }
-
-            /// <summary>
-            /// Get /set the location of the crc patch for this update.
-            /// </summary>
-            public long CrcPatchOffset
-            {
-                get { return crcPatchOffset_; }
-                set { crcPatchOffset_ = value; }
-            }
-
-            public Stream GetSource()
-            {
-                Stream result = null;
-                if (dataSource_ != null)
-                {
-                    result = dataSource_.GetSource();
-                }
-
-                return result;
-            }
 
             #region Instance Fields
 
@@ -3307,10 +3279,12 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Releases the unmanaged resources used by the this instance and optionally releases the managed resources.
+        ///     Releases the unmanaged resources used by the this instance and optionally releases the managed resources.
         /// </summary>
-        /// <param name="disposing">true to release both managed and unmanaged resources;
-        /// false to release only unmanaged resources.</param>
+        /// <param name="disposing">
+        ///     true to release both managed and unmanaged resources;
+        ///     false to release only unmanaged resources.
+        /// </param>
         protected virtual void Dispose(bool disposing)
         {
             DisposeInternal(disposing);
@@ -3323,22 +3297,22 @@ namespace TidyBackups.SharpZipLib.Zip
         #region Reading
 
         /// <summary>
-        /// Read an unsigned short in little endian byte order.
+        ///     Read an unsigned short in little endian byte order.
         /// </summary>
         /// <returns>Returns the value read.</returns>
         /// <exception cref="EndOfStreamException">
-        /// The stream ends prematurely
+        ///     The stream ends prematurely
         /// </exception>
         private ushort ReadLEUshort()
         {
-            int data1 = baseStream_.ReadByte();
+            var data1 = baseStream_.ReadByte();
 
             if (data1 < 0)
             {
                 throw new EndOfStreamException("End of stream");
             }
 
-            int data2 = baseStream_.ReadByte();
+            var data2 = baseStream_.ReadByte();
 
             if (data2 < 0)
             {
@@ -3350,14 +3324,14 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Read a uint in little endian byte order.
+        ///     Read a uint in little endian byte order.
         /// </summary>
         /// <returns>Returns the value read.</returns>
         /// <exception cref="IOException">
-        /// An i/o error occurs.
+        ///     An i/o error occurs.
         /// </exception>
         /// <exception cref="System.IO.EndOfStreamException">
-        /// The file ends prematurely
+        ///     The file ends prematurely
         /// </exception>
         private uint ReadLEUint()
         {
@@ -3373,7 +3347,7 @@ namespace TidyBackups.SharpZipLib.Zip
 
         // NOTE this returns the offset of the first byte after the signature.
         private long LocateBlockWithSignature(int signature, long endLocation, int minimumBlockSize,
-                                              int maximumVariableData)
+            int maximumVariableData)
         {
             using (var les = new ZipHelperStream(baseStream_))
             {
@@ -3382,13 +3356,13 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Search for and read the central directory of a zip file filling the entries array.
+        ///     Search for and read the central directory of a zip file filling the entries array.
         /// </summary>
         /// <exception cref="System.IO.IOException">
-        /// An i/o error occurs.
+        ///     An i/o error occurs.
         /// </exception>
         /// <exception cref="SharpZipLib.Zip.ZipException">
-        /// The central directory is malformed or cannot be found
+        ///     The central directory is malformed or cannot be found
         /// </exception>
         private void ReadEntries()
         {
@@ -3406,9 +3380,9 @@ namespace TidyBackups.SharpZipLib.Zip
                 throw new ZipException("ZipFile stream must be seekable");
             }
 
-            long locatedEndOfCentralDir = LocateBlockWithSignature(ZipConstants.EndOfCentralDirectorySignature,
-                                                                   baseStream_.Length,
-                                                                   ZipConstants.EndOfCentralRecordBaseSize, 0xffff);
+            var locatedEndOfCentralDir = LocateBlockWithSignature(ZipConstants.EndOfCentralDirectorySignature,
+                baseStream_.Length,
+                ZipConstants.EndOfCentralRecordBaseSize, 0xffff);
 
             if (locatedEndOfCentralDir < 0)
             {
@@ -3416,8 +3390,8 @@ namespace TidyBackups.SharpZipLib.Zip
             }
 
             // Read end of central directory record
-            ushort thisDiskNumber = ReadLEUshort();
-            ushort startCentralDirDisk = ReadLEUshort();
+            var thisDiskNumber = ReadLEUshort();
+            var startCentralDirDisk = ReadLEUshort();
             ulong entriesForThisDisk = ReadLEUshort();
             ulong entriesForWholeCentralDir = ReadLEUshort();
             ulong centralDirSize = ReadLEUint();
@@ -3429,14 +3403,14 @@ namespace TidyBackups.SharpZipLib.Zip
                 var comment = new byte[commentSize];
 
                 StreamUtils.ReadFully(baseStream_, comment);
-                comment_ = ZipConstants.ConvertToString(comment);
+                ZipFileComment = ZipConstants.ConvertToString(comment);
             }
             else
             {
-                comment_ = string.Empty;
+                ZipFileComment = string.Empty;
             }
 
-            bool isZip64 = false;
+            var isZip64 = false;
 
             // Check if zip64 header information is required.
             if ((thisDiskNumber == 0xffff) ||
@@ -3448,8 +3422,8 @@ namespace TidyBackups.SharpZipLib.Zip
             {
                 isZip64 = true;
 
-                long offset = LocateBlockWithSignature(ZipConstants.Zip64CentralDirLocatorSignature,
-                                                       locatedEndOfCentralDir, 0, 0x1000);
+                var offset = LocateBlockWithSignature(ZipConstants.Zip64CentralDirLocatorSignature,
+                    locatedEndOfCentralDir, 0, 0x1000);
                 if (offset < 0)
                 {
                     throw new ZipException("Cannot find Zip64 locator");
@@ -3459,8 +3433,8 @@ namespace TidyBackups.SharpZipLib.Zip
                 // relative offset of the zip64 end of central directory record 8 bytes 
                 // total number of disks 4 bytes 
                 ReadLEUint(); // startDisk64 is not currently used
-                ulong offset64 = ReadLEUlong();
-                uint totalDisks = ReadLEUint();
+                var offset64 = ReadLEUlong();
+                var totalDisks = ReadLEUint();
 
                 baseStream_.Position = (long) offset64;
                 long sig64 = ReadLEUint();
@@ -3471,11 +3445,11 @@ namespace TidyBackups.SharpZipLib.Zip
                 }
 
                 // NOTE: Record size = SizeOfFixedFields + SizeOfVariableData - 12.
-                ulong recordSize = ReadLEUlong();
+                var recordSize = ReadLEUlong();
                 int versionMadeBy = ReadLEUshort();
                 int versionToExtract = ReadLEUshort();
-                uint thisDisk = ReadLEUint();
-                uint centralDirDisk = ReadLEUint();
+                var thisDisk = ReadLEUint();
+                var centralDirDisk = ReadLEUint();
                 entriesForThisDisk = ReadLEUlong();
                 entriesForWholeCentralDir = ReadLEUlong();
                 centralDirSize = ReadLEUlong();
@@ -3514,8 +3488,8 @@ namespace TidyBackups.SharpZipLib.Zip
                 int versionToExtract = ReadLEUshort();
                 int bitFlags = ReadLEUshort();
                 int method = ReadLEUshort();
-                uint dostime = ReadLEUint();
-                uint crc = ReadLEUint();
+                var dostime = ReadLEUint();
+                var crc = ReadLEUint();
                 long csize = ReadLEUint();
                 long size = ReadLEUint();
                 int nameLen = ReadLEUshort();
@@ -3525,13 +3499,13 @@ namespace TidyBackups.SharpZipLib.Zip
                 int diskStartNo = ReadLEUshort(); // Not currently used
                 int internalAttributes = ReadLEUshort(); // Not currently used
 
-                uint externalAttributes = ReadLEUint();
+                var externalAttributes = ReadLEUint();
                 long offset = ReadLEUint();
 
                 var buffer = new byte[Math.Max(nameLen, commentLen)];
 
                 StreamUtils.ReadFully(baseStream_, buffer, 0, nameLen);
-                string name = ZipConstants.ConvertToStringExt(bitFlags, buffer, nameLen);
+                var name = ZipConstants.ConvertToStringExt(bitFlags, buffer, nameLen);
 
                 var entry = new ZipEntry(name, versionToExtract, versionMadeBy, (CompressionMethod) method);
                 entry.Crc = crc & 0xffffffffL;
@@ -3572,17 +3546,17 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Locate the data for a given entry.
+        ///     Locate the data for a given entry.
         /// </summary>
         /// <returns>
-        /// The start offset of the data.
+        ///     The start offset of the data.
         /// </returns>
         /// <exception cref="System.IO.EndOfStreamException">
-        /// The stream ends prematurely
+        ///     The stream ends prematurely
         /// </exception>
         /// <exception cref="SharpZipLib.Zip.ZipException">
-        /// The local header signature is invalid, the entry and central header file name lengths are different
-        /// or the local and entry compression methods dont match
+        ///     The local header signature is invalid, the entry and central header file name lengths are different
+        ///     or the local and entry compression methods dont match
         /// </exception>
         private long LocateEntry(ZipEntry entry)
         {
@@ -3605,7 +3579,7 @@ namespace TidyBackups.SharpZipLib.Zip
                     throw new ZipException("No password available for encrypted stream");
                 }
 
-                result = new CryptoStream(baseStream, classicManaged.CreateDecryptor(key, null), CryptoStreamMode.Read);
+                result = new CryptoStream(baseStream, classicManaged.CreateDecryptor(Key, null), CryptoStreamMode.Read);
                 CheckClassicPassword(result, entry);
             }
             else
@@ -3633,7 +3607,7 @@ namespace TidyBackups.SharpZipLib.Zip
                 // Closing a CryptoStream will close the base stream as well so wrap it in an UncompressedStream
                 // which doesnt do this.
                 result = new CryptoStream(new UncompressedStream(baseStream),
-                                          classicManaged.CreateEncryptor(key, null), CryptoStreamMode.Write);
+                    classicManaged.CreateEncryptor(Key, null), CryptoStreamMode.Write);
 
                 if ((entry.Crc < 0) || (entry.Flags & 8) != 0)
                 {
@@ -3672,14 +3646,9 @@ namespace TidyBackups.SharpZipLib.Zip
         #region Instance Fields
 
         private bool isDisposed_;
-        private string name_;
-        private string comment_;
         private Stream baseStream_;
-        private bool isStreamOwner;
         private long offsetOfFirstEntry;
         private ZipEntry[] entries_;
-        private byte[] key;
-        private bool isNewArchive_;
 
         // Default is dynamic which is not backwards compatible and can cause problems
         // with XP's built in compression which cant read Zip64 archives.
@@ -3708,36 +3677,13 @@ namespace TidyBackups.SharpZipLib.Zip
         #region Support Classes
 
         /// <summary>
-        /// Represents a string from a <see cref="ZipFile"/> which is stored as an array of bytes.
+        ///     Represents a string from a <see cref="ZipFile" /> which is stored as an array of bytes.
         /// </summary>
         private class ZipString
         {
-            #region Constructors
-
             /// <summary>
-            /// Initialise a <see cref="ZipString"/> with a string.
-            /// </summary>
-            /// <param name="comment">The textual string form.</param>
-            public ZipString(string comment)
-            {
-                comment_ = comment;
-                isSourceString_ = true;
-            }
-
-            /// <summary>
-            /// Initialise a <see cref="ZipString"/> using a string in its binary 'raw' form.
-            /// </summary>
-            /// <param name="rawString"></param>
-            public ZipString(byte[] rawString)
-            {
-                rawComment_ = rawString;
-            }
-
-            #endregion
-
-            /// <summary>
-            /// Get a value indicating the original source of data for this instance.
-            /// True if the source was a string; false if the source was binary data.
+            ///     Get a value indicating the original source of data for this instance.
+            ///     True if the source was a string; false if the source was binary data.
             /// </summary>
             public bool IsSourceString
             {
@@ -3745,7 +3691,7 @@ namespace TidyBackups.SharpZipLib.Zip
             }
 
             /// <summary>
-            /// Get the length of the comment when represented as raw bytes.
+            ///     Get the length of the comment when represented as raw bytes.
             /// </summary>
             public int RawLength
             {
@@ -3757,7 +3703,7 @@ namespace TidyBackups.SharpZipLib.Zip
             }
 
             /// <summary>
-            /// Get the comment in its 'raw' form as plain bytes.
+            ///     Get the comment in its 'raw' form as plain bytes.
             /// </summary>
             public byte[] RawComment
             {
@@ -3769,7 +3715,7 @@ namespace TidyBackups.SharpZipLib.Zip
             }
 
             /// <summary>
-            /// Reset the comment to its initial state.
+            ///     Reset the comment to its initial state.
             /// </summary>
             public void Reset()
             {
@@ -3800,15 +3746,38 @@ namespace TidyBackups.SharpZipLib.Zip
             }
 
             /// <summary>
-            /// Implicit conversion of comment to a string.
+            ///     Implicit conversion of comment to a string.
             /// </summary>
-            /// <param name="zipString">The <see cref="ZipString"/> to convert to a string.</param>
+            /// <param name="zipString">The <see cref="ZipString" /> to convert to a string.</param>
             /// <returns>The textual equivalent for the input value.</returns>
             public static implicit operator string(ZipString zipString)
             {
                 zipString.MakeTextAvailable();
                 return zipString.comment_;
             }
+
+            #region Constructors
+
+            /// <summary>
+            ///     Initialise a <see cref="ZipString" /> with a string.
+            /// </summary>
+            /// <param name="comment">The textual string form.</param>
+            public ZipString(string comment)
+            {
+                comment_ = comment;
+                isSourceString_ = true;
+            }
+
+            /// <summary>
+            ///     Initialise a <see cref="ZipString" /> using a string in its binary 'raw' form.
+            /// </summary>
+            /// <param name="rawString"></param>
+            public ZipString(byte[] rawString)
+            {
+                rawComment_ = rawString;
+            }
+
+            #endregion
 
             #region Instance Fields
 
@@ -3820,7 +3789,7 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// An <see cref="IEnumerator">enumerator</see> for <see cref="ZipEntry">Zip entries</see>
+        ///     An <see cref="IEnumerator">enumerator</see> for <see cref="ZipEntry">Zip entries</see>
         /// </summary>
         private class ZipEntryEnumerator : IEnumerator
         {
@@ -3861,11 +3830,17 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// An <see cref="UncompressedStream"/> is a stream that you can write uncompressed data
-        /// to and flush, but cannot read, seek or do anything else to.
+        ///     An <see cref="UncompressedStream" /> is a stream that you can write uncompressed data
+        ///     to and flush, but cannot read, seek or do anything else to.
         /// </summary>
         private class UncompressedStream : Stream
         {
+            #region Instance Fields
+
+            private readonly Stream baseStream_;
+
+            #endregion
+
             #region Constructors
 
             public UncompressedStream(Stream baseStream)
@@ -3876,7 +3851,7 @@ namespace TidyBackups.SharpZipLib.Zip
             #endregion
 
             /// <summary>
-            /// Gets a value indicating whether the current stream supports reading.
+            ///     Gets a value indicating whether the current stream supports reading.
             /// </summary>
             public override bool CanRead
             {
@@ -3884,7 +3859,7 @@ namespace TidyBackups.SharpZipLib.Zip
             }
 
             /// <summary>
-            /// Gets a value indicating whether the current stream supports writing.
+            ///     Gets a value indicating whether the current stream supports writing.
             /// </summary>
             public override bool CanWrite
             {
@@ -3892,7 +3867,7 @@ namespace TidyBackups.SharpZipLib.Zip
             }
 
             /// <summary>
-            /// Gets a value indicating whether the current stream supports seeking.
+            ///     Gets a value indicating whether the current stream supports seeking.
             /// </summary>
             public override bool CanSeek
             {
@@ -3900,7 +3875,7 @@ namespace TidyBackups.SharpZipLib.Zip
             }
 
             /// <summary>
-            /// Get the length in bytes of the stream.
+            ///     Get the length in bytes of the stream.
             /// </summary>
             public override long Length
             {
@@ -3908,7 +3883,7 @@ namespace TidyBackups.SharpZipLib.Zip
             }
 
             /// <summary>
-            /// Gets or sets the position within the current stream.
+            ///     Gets or sets the position within the current stream.
             /// </summary>
             public override long Position
             {
@@ -3918,7 +3893,7 @@ namespace TidyBackups.SharpZipLib.Zip
             }
 
             /// <summary>
-            /// Close this stream instance.
+            ///     Close this stream instance.
             /// </summary>
             public override void Close()
             {
@@ -3926,7 +3901,7 @@ namespace TidyBackups.SharpZipLib.Zip
             }
 
             /// <summary>
-            /// Write any buffered data to underlying storage.
+            ///     Write any buffered data to underlying storage.
             /// </summary>
             public override void Flush()
             {
@@ -3934,13 +3909,21 @@ namespace TidyBackups.SharpZipLib.Zip
             }
 
             /// <summary>
-            /// Reads a sequence of bytes from the current stream and advances the position within the stream by the number of bytes read.
+            ///     Reads a sequence of bytes from the current stream and advances the position within the stream by the number of
+            ///     bytes read.
             /// </summary>
-            /// <param name="buffer">An array of bytes. When this method returns, the buffer contains the specified byte array with the values between offset and (offset + count - 1) replaced by the bytes read from the current source.</param>
-            /// <param name="offset">The zero-based byte offset in buffer at which to begin storing the data read from the current stream.</param>
+            /// <param name="buffer">
+            ///     An array of bytes. When this method returns, the buffer contains the specified byte array with the
+            ///     values between offset and (offset + count - 1) replaced by the bytes read from the current source.
+            /// </param>
+            /// <param name="offset">
+            ///     The zero-based byte offset in buffer at which to begin storing the data read from the current
+            ///     stream.
+            /// </param>
             /// <param name="count">The maximum number of bytes to be read from the current stream.</param>
             /// <returns>
-            /// The total number of bytes read into the buffer. This can be less than the number of bytes requested if that many bytes are not currently available, or zero (0) if the end of the stream has been reached.
+            ///     The total number of bytes read into the buffer. This can be less than the number of bytes requested if that many
+            ///     bytes are not currently available, or zero (0) if the end of the stream has been reached.
             /// </returns>
             /// <exception cref="T:System.ArgumentException">The sum of offset and count is larger than the buffer length. </exception>
             /// <exception cref="T:System.ObjectDisposedException">Methods were called after the stream was closed. </exception>
@@ -3954,15 +3937,21 @@ namespace TidyBackups.SharpZipLib.Zip
             }
 
             /// <summary>
-            /// Sets the position within the current stream.
+            ///     Sets the position within the current stream.
             /// </summary>
             /// <param name="offset">A byte offset relative to the origin parameter.</param>
-            /// <param name="origin">A value of type <see cref="T:System.IO.SeekOrigin"></see> indicating the reference point used to obtain the new position.</param>
+            /// <param name="origin">
+            ///     A value of type <see cref="T:System.IO.SeekOrigin"></see> indicating the reference point used to
+            ///     obtain the new position.
+            /// </param>
             /// <returns>
-            /// The new position within the current stream.
+            ///     The new position within the current stream.
             /// </returns>
             /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
-            /// <exception cref="T:System.NotSupportedException">The stream does not support seeking, such as if the stream is constructed from a pipe or console output. </exception>
+            /// <exception cref="T:System.NotSupportedException">
+            ///     The stream does not support seeking, such as if the stream is
+            ///     constructed from a pipe or console output.
+            /// </exception>
             /// <exception cref="T:System.ObjectDisposedException">Methods were called after the stream was closed. </exception>
             public override long Seek(long offset, SeekOrigin origin)
             {
@@ -3970,10 +3959,13 @@ namespace TidyBackups.SharpZipLib.Zip
             }
 
             /// <summary>
-            /// Sets the length of the current stream.
+            ///     Sets the length of the current stream.
             /// </summary>
             /// <param name="value">The desired length of the current stream in bytes.</param>
-            /// <exception cref="T:System.NotSupportedException">The stream does not support both writing and seeking, such as if the stream is constructed from a pipe or console output. </exception>
+            /// <exception cref="T:System.NotSupportedException">
+            ///     The stream does not support both writing and seeking, such as if the
+            ///     stream is constructed from a pipe or console output.
+            /// </exception>
             /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
             /// <exception cref="T:System.ObjectDisposedException">Methods were called after the stream was closed. </exception>
             public override void SetLength(long value)
@@ -3981,7 +3973,8 @@ namespace TidyBackups.SharpZipLib.Zip
             }
 
             /// <summary>
-            /// Writes a sequence of bytes to the current stream and advances the current position within this stream by the number of bytes written.
+            ///     Writes a sequence of bytes to the current stream and advances the current position within this stream by the number
+            ///     of bytes written.
             /// </summary>
             /// <param name="buffer">An array of bytes. This method copies count bytes from buffer to the current stream.</param>
             /// <param name="offset">The zero-based byte offset in buffer at which to begin copying bytes to the current stream.</param>
@@ -3996,26 +3989,20 @@ namespace TidyBackups.SharpZipLib.Zip
             {
                 baseStream_.Write(buffer, offset, count);
             }
-
-            #region Instance Fields
-
-            private readonly Stream baseStream_;
-
-            #endregion
         }
 
         /// <summary>
-        /// A <see cref="PartialInputStream"/> is an <see cref="InflaterInputStream"/>
-        /// whose data is only a part or subsection of a file.
+        ///     A <see cref="PartialInputStream" /> is an <see cref="InflaterInputStream" />
+        ///     whose data is only a part or subsection of a file.
         /// </summary>
         private class PartialInputStream : Stream
         {
             #region Constructors
 
             /// <summary>
-            /// Initialise a new instance of the <see cref="PartialInputStream"/> class.
+            ///     Initialise a new instance of the <see cref="PartialInputStream" /> class.
             /// </summary>
-            /// <param name="zipFile">The <see cref="ZipFile"/> containing the underlying stream to use for IO.</param>
+            /// <param name="zipFile">The <see cref="ZipFile" /> containing the underlying stream to use for IO.</param>
             /// <param name="start">The start of the partial data.</param>
             /// <param name="length">The length of the partial data.</param>
             public PartialInputStream(ZipFile zipFile, long start, long length)
@@ -4042,7 +4029,89 @@ namespace TidyBackups.SharpZipLib.Zip
             #endregion
 
             /// <summary>
-            /// Read a byte from this stream.
+            ///     Gets or sets the position within the current stream.
+            /// </summary>
+            /// <value></value>
+            /// <returns>The current position within the stream.</returns>
+            /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
+            /// <exception cref="T:System.NotSupportedException">The stream does not support seeking. </exception>
+            /// <exception cref="T:System.ObjectDisposedException">Methods were called after the stream was closed. </exception>
+            public override long Position
+            {
+                get { return readPos_ - start_; }
+                set
+                {
+                    var newPos = start_ + value;
+
+                    if (newPos < start_)
+                    {
+                        throw new ArgumentException("Negative position is invalid");
+                    }
+
+                    if (newPos >= end_)
+                    {
+                        throw new InvalidOperationException("Cannot seek past end");
+                    }
+                    readPos_ = newPos;
+                }
+            }
+
+            /// <summary>
+            ///     Gets the length in bytes of the stream.
+            /// </summary>
+            /// <value></value>
+            /// <returns>A long value representing the length of the stream in bytes.</returns>
+            /// <exception cref="T:System.NotSupportedException">A class derived from Stream does not support seeking. </exception>
+            /// <exception cref="T:System.ObjectDisposedException">Methods were called after the stream was closed. </exception>
+            public override long Length
+            {
+                get { return length_; }
+            }
+
+            /// <summary>
+            ///     Gets a value indicating whether the current stream supports writing.
+            /// </summary>
+            /// <value>false</value>
+            /// <returns>true if the stream supports writing; otherwise, false.</returns>
+            public override bool CanWrite
+            {
+                get { return false; }
+            }
+
+            /// <summary>
+            ///     Gets a value indicating whether the current stream supports seeking.
+            /// </summary>
+            /// <value>true</value>
+            /// <returns>true if the stream supports seeking; otherwise, false.</returns>
+            public override bool CanSeek
+            {
+                get { return true; }
+            }
+
+            /// <summary>
+            ///     Gets a value indicating whether the current stream supports reading.
+            /// </summary>
+            /// <value>true.</value>
+            /// <returns>true if the stream supports reading; otherwise, false.</returns>
+            public override bool CanRead
+            {
+                get { return true; }
+            }
+
+#if !NET_1_0 && !NET_1_1 && !NETCF_1_0
+            /// <summary>
+            ///     Gets a value that determines whether the current stream can time out.
+            /// </summary>
+            /// <value></value>
+            /// <returns>A value that determines whether the current stream can time out.</returns>
+            public override bool CanTimeout
+            {
+                get { return baseStream_.CanTimeout; }
+            }
+#endif
+
+            /// <summary>
+            ///     Read a byte from this stream.
             /// </summary>
             /// <returns>Returns the byte read or -1 on end of stream.</returns>
             public override int ReadByte()
@@ -4061,10 +4130,10 @@ namespace TidyBackups.SharpZipLib.Zip
             }
 
             /// <summary>
-            /// Close this <see cref="PartialInputStream">partial input stream</see>.
+            ///     Close this <see cref="PartialInputStream">partial input stream</see>.
             /// </summary>
             /// <remarks>
-            /// The underlying stream is not closed.  Close the parent ZipFile class to do that.
+            ///     The underlying stream is not closed.  Close the parent ZipFile class to do that.
             /// </remarks>
             public override void Close()
             {
@@ -4072,13 +4141,21 @@ namespace TidyBackups.SharpZipLib.Zip
             }
 
             /// <summary>
-            /// Reads a sequence of bytes from the current stream and advances the position within the stream by the number of bytes read.
+            ///     Reads a sequence of bytes from the current stream and advances the position within the stream by the number of
+            ///     bytes read.
             /// </summary>
-            /// <param name="buffer">An array of bytes. When this method returns, the buffer contains the specified byte array with the values between offset and (offset + count - 1) replaced by the bytes read from the current source.</param>
-            /// <param name="offset">The zero-based byte offset in buffer at which to begin storing the data read from the current stream.</param>
+            /// <param name="buffer">
+            ///     An array of bytes. When this method returns, the buffer contains the specified byte array with the
+            ///     values between offset and (offset + count - 1) replaced by the bytes read from the current source.
+            /// </param>
+            /// <param name="offset">
+            ///     The zero-based byte offset in buffer at which to begin storing the data read from the current
+            ///     stream.
+            /// </param>
             /// <param name="count">The maximum number of bytes to be read from the current stream.</param>
             /// <returns>
-            /// The total number of bytes read into the buffer. This can be less than the number of bytes requested if that many bytes are not currently available, or zero (0) if the end of the stream has been reached.
+            ///     The total number of bytes read into the buffer. This can be less than the number of bytes requested if that many
+            ///     bytes are not currently available, or zero (0) if the end of the stream has been reached.
             /// </returns>
             /// <exception cref="T:System.ArgumentException">The sum of offset and count is larger than the buffer length. </exception>
             /// <exception cref="T:System.ObjectDisposedException">Methods were called after the stream was closed. </exception>
@@ -4100,7 +4177,7 @@ namespace TidyBackups.SharpZipLib.Zip
                     }
 
                     baseStream_.Seek(readPos_, SeekOrigin.Begin);
-                    int readCount = baseStream_.Read(buffer, offset, count);
+                    var readCount = baseStream_.Read(buffer, offset, count);
                     if (readCount > 0)
                     {
                         readPos_ += readCount;
@@ -4110,7 +4187,8 @@ namespace TidyBackups.SharpZipLib.Zip
             }
 
             /// <summary>
-            /// Writes a sequence of bytes to the current stream and advances the current position within this stream by the number of bytes written.
+            ///     Writes a sequence of bytes to the current stream and advances the current position within this stream by the number
+            ///     of bytes written.
             /// </summary>
             /// <param name="buffer">An array of bytes. This method copies count bytes from buffer to the current stream.</param>
             /// <param name="offset">The zero-based byte offset in buffer at which to begin copying bytes to the current stream.</param>
@@ -4127,10 +4205,13 @@ namespace TidyBackups.SharpZipLib.Zip
             }
 
             /// <summary>
-            /// When overridden in a derived class, sets the length of the current stream.
+            ///     When overridden in a derived class, sets the length of the current stream.
             /// </summary>
             /// <param name="value">The desired length of the current stream in bytes.</param>
-            /// <exception cref="T:System.NotSupportedException">The stream does not support both writing and seeking, such as if the stream is constructed from a pipe or console output. </exception>
+            /// <exception cref="T:System.NotSupportedException">
+            ///     The stream does not support both writing and seeking, such as if the
+            ///     stream is constructed from a pipe or console output.
+            /// </exception>
             /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
             /// <exception cref="T:System.ObjectDisposedException">Methods were called after the stream was closed. </exception>
             public override void SetLength(long value)
@@ -4139,19 +4220,25 @@ namespace TidyBackups.SharpZipLib.Zip
             }
 
             /// <summary>
-            /// When overridden in a derived class, sets the position within the current stream.
+            ///     When overridden in a derived class, sets the position within the current stream.
             /// </summary>
             /// <param name="offset">A byte offset relative to the origin parameter.</param>
-            /// <param name="origin">A value of type <see cref="T:System.IO.SeekOrigin"></see> indicating the reference point used to obtain the new position.</param>
+            /// <param name="origin">
+            ///     A value of type <see cref="T:System.IO.SeekOrigin"></see> indicating the reference point used to
+            ///     obtain the new position.
+            /// </param>
             /// <returns>
-            /// The new position within the current stream.
+            ///     The new position within the current stream.
             /// </returns>
             /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
-            /// <exception cref="T:System.NotSupportedException">The stream does not support seeking, such as if the stream is constructed from a pipe or console output. </exception>
+            /// <exception cref="T:System.NotSupportedException">
+            ///     The stream does not support seeking, such as if the stream is
+            ///     constructed from a pipe or console output.
+            /// </exception>
             /// <exception cref="T:System.ObjectDisposedException">Methods were called after the stream was closed. </exception>
             public override long Seek(long offset, SeekOrigin origin)
             {
-                long newPos = readPos_;
+                var newPos = readPos_;
 
                 switch (origin)
                 {
@@ -4182,95 +4269,13 @@ namespace TidyBackups.SharpZipLib.Zip
             }
 
             /// <summary>
-            /// Clears all buffers for this stream and causes any buffered data to be written to the underlying device.
+            ///     Clears all buffers for this stream and causes any buffered data to be written to the underlying device.
             /// </summary>
             /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
             public override void Flush()
             {
                 // Nothing to do.
             }
-
-            /// <summary>
-            /// Gets or sets the position within the current stream.
-            /// </summary>
-            /// <value></value>
-            /// <returns>The current position within the stream.</returns>
-            /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
-            /// <exception cref="T:System.NotSupportedException">The stream does not support seeking. </exception>
-            /// <exception cref="T:System.ObjectDisposedException">Methods were called after the stream was closed. </exception>
-            public override long Position
-            {
-                get { return readPos_ - start_; }
-                set
-                {
-                    long newPos = start_ + value;
-
-                    if (newPos < start_)
-                    {
-                        throw new ArgumentException("Negative position is invalid");
-                    }
-
-                    if (newPos >= end_)
-                    {
-                        throw new InvalidOperationException("Cannot seek past end");
-                    }
-                    readPos_ = newPos;
-                }
-            }
-
-            /// <summary>
-            /// Gets the length in bytes of the stream.
-            /// </summary>
-            /// <value></value>
-            /// <returns>A long value representing the length of the stream in bytes.</returns>
-            /// <exception cref="T:System.NotSupportedException">A class derived from Stream does not support seeking. </exception>
-            /// <exception cref="T:System.ObjectDisposedException">Methods were called after the stream was closed. </exception>
-            public override long Length
-            {
-                get { return length_; }
-            }
-
-            /// <summary>
-            /// Gets a value indicating whether the current stream supports writing.
-            /// </summary>
-            /// <value>false</value>
-            /// <returns>true if the stream supports writing; otherwise, false.</returns>
-            public override bool CanWrite
-            {
-                get { return false; }
-            }
-
-            /// <summary>
-            /// Gets a value indicating whether the current stream supports seeking.
-            /// </summary>
-            /// <value>true</value>
-            /// <returns>true if the stream supports seeking; otherwise, false.</returns>
-            public override bool CanSeek
-            {
-                get { return true; }
-            }
-
-            /// <summary>
-            /// Gets a value indicating whether the current stream supports reading.
-            /// </summary>
-            /// <value>true.</value>
-            /// <returns>true if the stream supports reading; otherwise, false.</returns>
-            public override bool CanRead
-            {
-                get { return true; }
-            }
-
-#if !NET_1_0 && !NET_1_1 && !NETCF_1_0
-            /// <summary>
-            /// Gets a value that determines whether the current stream can time out.
-            /// </summary>
-            /// <value></value>
-            /// <returns>A value that determines whether the current stream can time out.</returns>
-            public override bool CanTimeout
-            {
-                get { return baseStream_.CanTimeout; }
-            }
-#endif
 
             #region Instance Fields
 
@@ -4292,41 +4297,47 @@ namespace TidyBackups.SharpZipLib.Zip
     #region DataSources
 
     /// <summary>
-    /// Provides a static way to obtain a source of data for an entry.
+    ///     Provides a static way to obtain a source of data for an entry.
     /// </summary>
     public interface IStaticDataSource
     {
         /// <summary>
-        /// Get a source of data by creating a new stream.
+        ///     Get a source of data by creating a new stream.
         /// </summary>
-        /// <returns>Returns a <see cref="Stream"/> to use for compression input.</returns>
+        /// <returns>Returns a <see cref="Stream" /> to use for compression input.</returns>
         /// <remarks>Ideally a new stream is created and opened to achieve this, to avoid locking problems.</remarks>
         Stream GetSource();
     }
 
     /// <summary>
-    /// Represents a source of data that can dynamically provide
-    /// multiple <see cref="Stream">data sources</see> based on the parameters passed.
+    ///     Represents a source of data that can dynamically provide
+    ///     multiple <see cref="Stream">data sources</see> based on the parameters passed.
     /// </summary>
     public interface IDynamicDataSource
     {
         /// <summary>
-        /// Get a data source.
+        ///     Get a data source.
         /// </summary>
-        /// <param name="entry">The <see cref="ZipEntry"/> to get a source for.</param>
+        /// <param name="entry">The <see cref="ZipEntry" /> to get a source for.</param>
         /// <param name="name">The name for data if known.</param>
-        /// <returns>Returns a <see cref="Stream"/> to use for compression input.</returns>
+        /// <returns>Returns a <see cref="Stream" /> to use for compression input.</returns>
         /// <remarks>Ideally a new stream is created and opened to achieve this, to avoid locking problems.</remarks>
         Stream GetSource(ZipEntry entry, string name);
     }
 
     /// <summary>
-    /// Default implementation of a <see cref="IStaticDataSource"/> for use with files stored on disk.
+    ///     Default implementation of a <see cref="IStaticDataSource" /> for use with files stored on disk.
     /// </summary>
     public class StaticDiskDataSource : IStaticDataSource
     {
+        #region Instance Fields
+
+        private readonly string fileName_;
+
+        #endregion
+
         /// <summary>
-        /// Initialise a new instnace of <see cref="StaticDiskDataSource"/>
+        ///     Initialise a new instnace of <see cref="StaticDiskDataSource" />
         /// </summary>
         /// <param name="fileName">The name of the file to obtain data from.</param>
         public StaticDiskDataSource(string fileName)
@@ -4337,33 +4348,27 @@ namespace TidyBackups.SharpZipLib.Zip
         #region IStaticDataSource Members
 
         /// <summary>
-        /// Get a <see cref="Stream"/> providing data.
+        ///     Get a <see cref="Stream" /> providing data.
         /// </summary>
-        /// <returns>Returns a <see cref="Stream"/> provising data.</returns>
+        /// <returns>Returns a <see cref="Stream" /> provising data.</returns>
         public Stream GetSource()
         {
-            return System.IO.File.OpenRead(fileName_);
+            return File.OpenRead(fileName_);
         }
-
-        #endregion
-
-        #region Instance Fields
-
-        private readonly string fileName_;
 
         #endregion
     }
 
 
     /// <summary>
-    /// Default implementation of <see cref="IDynamicDataSource"/> for files stored on disk.
+    ///     Default implementation of <see cref="IDynamicDataSource" /> for files stored on disk.
     /// </summary>
     public class DynamicDiskDataSource : IDynamicDataSource
     {
         #region IDynamicDataSource Members
 
         /// <summary>
-        /// Get a <see cref="Stream"/> providing data for an entry.
+        ///     Get a <see cref="Stream" /> providing data for an entry.
         /// </summary>
         /// <param name="entry">The entry to provide data for.</param>
         /// <param name="name">The file name for data if known.</param>
@@ -4374,7 +4379,7 @@ namespace TidyBackups.SharpZipLib.Zip
 
             if (name != null)
             {
-                result = System.IO.File.OpenRead(name);
+                result = File.OpenRead(name);
             }
 
             return result;
@@ -4388,38 +4393,38 @@ namespace TidyBackups.SharpZipLib.Zip
     #region Archive Storage
 
     /// <summary>
-    /// Defines facilities for data storage when updating Zip Archives.
+    ///     Defines facilities for data storage when updating Zip Archives.
     /// </summary>
     public interface IArchiveStorage
     {
         /// <summary>
-        /// Get the <see cref="FileUpdateMode"/> to apply during updates.
+        ///     Get the <see cref="FileUpdateMode" /> to apply during updates.
         /// </summary>
         FileUpdateMode UpdateMode { get; }
 
         /// <summary>
-        /// Get an empty <see cref="Stream"/> that can be used for temporary output.
+        ///     Get an empty <see cref="Stream" /> that can be used for temporary output.
         /// </summary>
-        /// <returns>Returns a temporary output <see cref="Stream"/></returns>
+        /// <returns>Returns a temporary output <see cref="Stream" /></returns>
         /// <seealso cref="ConvertTemporaryToFinal"></seealso>
         Stream GetTemporaryOutput();
 
         /// <summary>
-        /// Convert a temporary output stream to a final stream.
+        ///     Convert a temporary output stream to a final stream.
         /// </summary>
-        /// <returns>The resulting final <see cref="Stream"/></returns>
-        /// <seealso cref="GetTemporaryOutput"/>
+        /// <returns>The resulting final <see cref="Stream" /></returns>
+        /// <seealso cref="GetTemporaryOutput" />
         Stream ConvertTemporaryToFinal();
 
         /// <summary>
-        /// Make a temporary copy of the original stream.
+        ///     Make a temporary copy of the original stream.
         /// </summary>
-        /// <param name="stream">The <see cref="Stream"/> to copy.</param>
-        /// <returns>Returns a temporary output <see cref="Stream"/> that is a copy of the input.</returns>
+        /// <param name="stream">The <see cref="Stream" /> to copy.</param>
+        /// <returns>Returns a temporary output <see cref="Stream" /> that is a copy of the input.</returns>
         Stream MakeTemporaryCopy(Stream stream);
 
         /// <summary>
-        /// Return a stream suitable for performing direct updates on the original source.
+        ///     Return a stream suitable for performing direct updates on the original source.
         /// </summary>
         /// <param name="stream">The current stream.</param>
         /// <returns>Returns a stream suitable for direct updating.</returns>
@@ -4427,20 +4432,26 @@ namespace TidyBackups.SharpZipLib.Zip
         Stream OpenForDirectUpdate(Stream stream);
 
         /// <summary>
-        /// Dispose of this instance.
+        ///     Dispose of this instance.
         /// </summary>
         void Dispose();
     }
 
     /// <summary>
-    /// An abstract <see cref="IArchiveStorage"/> suitable for extension by inheritance.
+    ///     An abstract <see cref="IArchiveStorage" /> suitable for extension by inheritance.
     /// </summary>
     public abstract class BaseArchiveStorage : IArchiveStorage
     {
+        #region Instance Fields
+
+        private readonly FileUpdateMode updateMode_;
+
+        #endregion
+
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BaseArchiveStorage"/> class.
+        ///     Initializes a new instance of the <see cref="BaseArchiveStorage" /> class.
         /// </summary>
         /// <param name="updateMode">The update mode.</param>
         protected BaseArchiveStorage(FileUpdateMode updateMode)
@@ -4453,41 +4464,43 @@ namespace TidyBackups.SharpZipLib.Zip
         #region IArchiveStorage Members
 
         /// <summary>
-        /// Gets a temporary output <see cref="Stream"/>
+        ///     Gets a temporary output <see cref="Stream" />
         /// </summary>
         /// <returns>Returns the temporary output stream.</returns>
         /// <seealso cref="ConvertTemporaryToFinal"></seealso>
         public abstract Stream GetTemporaryOutput();
 
         /// <summary>
-        /// Converts the temporary <see cref="Stream"/> to its final form.
+        ///     Converts the temporary <see cref="Stream" /> to its final form.
         /// </summary>
-        /// <returns>Returns a <see cref="Stream"/> that can be used to read
-        /// the final storage for the archive.</returns>
-        /// <seealso cref="GetTemporaryOutput"/>
+        /// <returns>
+        ///     Returns a <see cref="Stream" /> that can be used to read
+        ///     the final storage for the archive.
+        /// </returns>
+        /// <seealso cref="GetTemporaryOutput" />
         public abstract Stream ConvertTemporaryToFinal();
 
         /// <summary>
-        /// Make a temporary copy of a <see cref="Stream"/>.
+        ///     Make a temporary copy of a <see cref="Stream" />.
         /// </summary>
-        /// <param name="stream">The <see cref="Stream"/> to make a copy of.</param>
-        /// <returns>Returns a temporary output <see cref="Stream"/> that is a copy of the input.</returns>
+        /// <param name="stream">The <see cref="Stream" /> to make a copy of.</param>
+        /// <returns>Returns a temporary output <see cref="Stream" /> that is a copy of the input.</returns>
         public abstract Stream MakeTemporaryCopy(Stream stream);
 
         /// <summary>
-        /// Return a stream suitable for performing direct updates on the original source.
+        ///     Return a stream suitable for performing direct updates on the original source.
         /// </summary>
-        /// <param name="stream">The <see cref="Stream"/> to open for direct update.</param>
+        /// <param name="stream">The <see cref="Stream" /> to open for direct update.</param>
         /// <returns>Returns a stream suitable for direct updating.</returns>
         public abstract Stream OpenForDirectUpdate(Stream stream);
 
         /// <summary>
-        /// Disposes this instance.
+        ///     Disposes this instance.
         /// </summary>
         public abstract void Dispose();
 
         /// <summary>
-        /// Gets the update mode applicable.
+        ///     Gets the update mode applicable.
         /// </summary>
         /// <value>The update mode.</value>
         public FileUpdateMode UpdateMode
@@ -4496,50 +4509,15 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         #endregion
-
-        #region Instance Fields
-
-        private readonly FileUpdateMode updateMode_;
-
-        #endregion
     }
 
     /// <summary>
-    /// An <see cref="IArchiveStorage"/> implementation suitable for hard disks.
+    ///     An <see cref="IArchiveStorage" /> implementation suitable for hard disks.
     /// </summary>
     public class DiskArchiveStorage : BaseArchiveStorage
     {
-        #region Constructors
-
         /// <summary>
-        /// Initializes a new instance of the <see cref="DiskArchiveStorage"/> class.
-        /// </summary>
-        /// <param name="file">The file.</param>
-        /// <param name="updateMode">The update mode.</param>
-        public DiskArchiveStorage(ZipFile file, FileUpdateMode updateMode)
-            : base(updateMode)
-        {
-            if (file.Name == null)
-            {
-                throw new ZipException("Cant handle non file archives");
-            }
-
-            fileName_ = file.Name;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DiskArchiveStorage"/> class.
-        /// </summary>
-        /// <param name="file">The file.</param>
-        public DiskArchiveStorage(ZipFile file)
-            : this(file, FileUpdateMode.Safe)
-        {
-        }
-
-        #endregion
-
-        /// <summary>
-        /// Gets a temporary output <see cref="Stream"/> for performing updates on.
+        ///     Gets a temporary output <see cref="Stream" /> for performing updates on.
         /// </summary>
         /// <returns>Returns the temporary output stream.</returns>
         public override Stream GetTemporaryOutput()
@@ -4547,24 +4525,26 @@ namespace TidyBackups.SharpZipLib.Zip
             if (temporaryName_ != null)
             {
                 temporaryName_ = GetTempFileName(temporaryName_, true);
-                temporaryStream_ = System.IO.File.OpenWrite(temporaryName_);
+                temporaryStream_ = File.OpenWrite(temporaryName_);
             }
             else
             {
                 // Determine where to place files based on internal strategy.
                 // Currently this is always done in system temp directory.
                 temporaryName_ = Path.GetTempFileName();
-                temporaryStream_ = System.IO.File.OpenWrite(temporaryName_);
+                temporaryStream_ = File.OpenWrite(temporaryName_);
             }
 
             return temporaryStream_;
         }
 
         /// <summary>
-        /// Converts a temporary <see cref="Stream"/> to its final form.
+        ///     Converts a temporary <see cref="Stream" /> to its final form.
         /// </summary>
-        /// <returns>Returns a <see cref="Stream"/> that can be used to read
-        /// the final storage for the archive.</returns>
+        /// <returns>
+        ///     Returns a <see cref="Stream" /> that can be used to read
+        ///     the final storage for the archive.
+        /// </returns>
         public override Stream ConvertTemporaryToFinal()
         {
             if (temporaryStream_ == null)
@@ -4574,18 +4554,18 @@ namespace TidyBackups.SharpZipLib.Zip
 
             Stream result = null;
 
-            string moveTempName = GetTempFileName(fileName_, false);
-            bool newFileCreated = false;
+            var moveTempName = GetTempFileName(fileName_, false);
+            var newFileCreated = false;
 
             try
             {
                 temporaryStream_.Close();
-                System.IO.File.Move(fileName_, moveTempName);
-                System.IO.File.Move(temporaryName_, fileName_);
+                File.Move(fileName_, moveTempName);
+                File.Move(temporaryName_, fileName_);
                 newFileCreated = true;
-                System.IO.File.Delete(moveTempName);
+                File.Delete(moveTempName);
 
-                result = System.IO.File.OpenRead(fileName_);
+                result = File.OpenRead(fileName_);
             }
             catch (Exception)
             {
@@ -4594,8 +4574,8 @@ namespace TidyBackups.SharpZipLib.Zip
                 // Try to roll back changes...
                 if (!newFileCreated)
                 {
-                    System.IO.File.Move(moveTempName, fileName_);
-                    System.IO.File.Delete(temporaryName_);
+                    File.Move(moveTempName, fileName_);
+                    File.Delete(temporaryName_);
                 }
 
                 throw;
@@ -4605,29 +4585,29 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Make a temporary copy of a stream.
+        ///     Make a temporary copy of a stream.
         /// </summary>
-        /// <param name="stream">The <see cref="Stream"/> to copy.</param>
-        /// <returns>Returns a temporary output <see cref="Stream"/> that is a copy of the input.</returns>
+        /// <param name="stream">The <see cref="Stream" /> to copy.</param>
+        /// <returns>Returns a temporary output <see cref="Stream" /> that is a copy of the input.</returns>
         public override Stream MakeTemporaryCopy(Stream stream)
         {
             stream.Close();
 
             temporaryName_ = GetTempFileName(fileName_, true);
-            System.IO.File.Copy(fileName_, temporaryName_, true);
+            File.Copy(fileName_, temporaryName_, true);
 
             temporaryStream_ = new FileStream(temporaryName_,
-                                              FileMode.Open,
-                                              FileAccess.ReadWrite);
+                FileMode.Open,
+                FileAccess.ReadWrite);
             return temporaryStream_;
         }
 
         /// <summary>
-        /// Return a stream suitable for performing direct updates on the original source.
+        ///     Return a stream suitable for performing direct updates on the original source.
         /// </summary>
         /// <param name="stream">The current stream.</param>
         /// <returns>Returns a stream suitable for direct updating.</returns>
-        /// <remarks>If the <paramref name="stream"/> stream is not null this is used as is.</remarks>
+        /// <remarks>If the <paramref name="stream" /> stream is not null this is used as is.</remarks>
         public override Stream OpenForDirectUpdate(Stream stream)
         {
             Stream result;
@@ -4639,8 +4619,8 @@ namespace TidyBackups.SharpZipLib.Zip
                 }
 
                 result = new FileStream(fileName_,
-                                        FileMode.Open,
-                                        FileAccess.ReadWrite);
+                    FileMode.Open,
+                    FileAccess.ReadWrite);
             }
             else
             {
@@ -4651,7 +4631,7 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Disposes this instance.
+        ///     Disposes this instance.
         /// </summary>
         public override void Dispose()
         {
@@ -4673,21 +4653,21 @@ namespace TidyBackups.SharpZipLib.Zip
             }
             else
             {
-                int counter = 0;
-                int suffixSeed = DateTime.Now.Second;
+                var counter = 0;
+                var suffixSeed = DateTime.Now.Second;
 
                 while (result == null)
                 {
                     counter += 1;
-                    string newName = string.Format("{0}.{1}{2}.tmp", original, suffixSeed, counter);
-                    if (!System.IO.File.Exists(newName))
+                    var newName = string.Format("{0}.{1}{2}.tmp", original, suffixSeed, counter);
+                    if (!File.Exists(newName))
                     {
                         if (makeTempFile)
                         {
                             try
                             {
                                 // Try and create the file.
-                                using (FileStream stream = System.IO.File.Create(newName))
+                                using (var stream = File.Create(newName))
                                 {
                                 }
                                 result = newName;
@@ -4709,6 +4689,35 @@ namespace TidyBackups.SharpZipLib.Zip
 
         #endregion
 
+        #region Constructors
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="DiskArchiveStorage" /> class.
+        /// </summary>
+        /// <param name="file">The file.</param>
+        /// <param name="updateMode">The update mode.</param>
+        public DiskArchiveStorage(ZipFile file, FileUpdateMode updateMode)
+            : base(updateMode)
+        {
+            if (file.Name == null)
+            {
+                throw new ZipException("Cant handle non file archives");
+            }
+
+            fileName_ = file.Name;
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="DiskArchiveStorage" /> class.
+        /// </summary>
+        /// <param name="file">The file.</param>
+        public DiskArchiveStorage(ZipFile file)
+            : this(file, FileUpdateMode.Safe)
+        {
+        }
+
+        #endregion
+
         #region Instance Fields
 
         private readonly string fileName_;
@@ -4719,46 +4728,27 @@ namespace TidyBackups.SharpZipLib.Zip
     }
 
     /// <summary>
-    /// An <see cref="IArchiveStorage"/> implementation suitable for in memory streams.
+    ///     An <see cref="IArchiveStorage" /> implementation suitable for in memory streams.
     /// </summary>
     public class MemoryArchiveStorage : BaseArchiveStorage
     {
-        #region Constructors
+        #region Instance Fields
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MemoryArchiveStorage"/> class.
-        /// </summary>
-        public MemoryArchiveStorage()
-            : base(FileUpdateMode.Direct)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MemoryArchiveStorage"/> class.
-        /// </summary>
-        /// <param name="updateMode">The <see cref="FileUpdateMode"/> to use</param>
-        /// <remarks>This constructor is for testing as memory streams dont really require safe mode.</remarks>
-        public MemoryArchiveStorage(FileUpdateMode updateMode)
-            : base(updateMode)
-        {
-        }
+        private MemoryStream temporaryStream_;
 
         #endregion
 
         #region Properties
 
         /// <summary>
-        /// Get the stream returned by <see cref="ConvertTemporaryToFinal"/> if this was in fact called.
+        ///     Get the stream returned by <see cref="ConvertTemporaryToFinal" /> if this was in fact called.
         /// </summary>
-        public MemoryStream FinalStream
-        {
-            get { return finalStream_; }
-        }
+        public MemoryStream FinalStream { get; private set; }
 
         #endregion
 
         /// <summary>
-        /// Gets the temporary output <see cref="Stream"/>
+        ///     Gets the temporary output <see cref="Stream" />
         /// </summary>
         /// <returns>Returns the temporary output stream.</returns>
         public override Stream GetTemporaryOutput()
@@ -4768,10 +4758,12 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Converts the temporary <see cref="Stream"/> to its final form.
+        ///     Converts the temporary <see cref="Stream" /> to its final form.
         /// </summary>
-        /// <returns>Returns a <see cref="Stream"/> that can be used to read
-        /// the final storage for the archive.</returns>
+        /// <returns>
+        ///     Returns a <see cref="Stream" /> that can be used to read
+        ///     the final storage for the archive.
+        /// </returns>
         public override Stream ConvertTemporaryToFinal()
         {
             if (temporaryStream_ == null)
@@ -4779,15 +4771,15 @@ namespace TidyBackups.SharpZipLib.Zip
                 throw new ZipException("No temporary stream has been created");
             }
 
-            finalStream_ = new MemoryStream(temporaryStream_.ToArray());
-            return finalStream_;
+            FinalStream = new MemoryStream(temporaryStream_.ToArray());
+            return FinalStream;
         }
 
         /// <summary>
-        /// Make a temporary copy of the original stream.
+        ///     Make a temporary copy of the original stream.
         /// </summary>
-        /// <param name="stream">The <see cref="Stream"/> to copy.</param>
-        /// <returns>Returns a temporary output <see cref="Stream"/> that is a copy of the input.</returns>
+        /// <param name="stream">The <see cref="Stream" /> to copy.</param>
+        /// <returns>Returns a temporary output <see cref="Stream" /> that is a copy of the input.</returns>
         public override Stream MakeTemporaryCopy(Stream stream)
         {
             temporaryStream_ = new MemoryStream();
@@ -4797,12 +4789,14 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Return a stream suitable for performing direct updates on the original source.
+        ///     Return a stream suitable for performing direct updates on the original source.
         /// </summary>
         /// <param name="stream">The original source stream</param>
         /// <returns>Returns a stream suitable for direct updating.</returns>
-        /// <remarks>If the <paramref name="stream"/> passed is not null this is used;
-        /// otherwise a new <see cref="MemoryStream"/> is returned.</remarks>
+        /// <remarks>
+        ///     If the <paramref name="stream" /> passed is not null this is used;
+        ///     otherwise a new <see cref="MemoryStream" /> is returned.
+        /// </remarks>
         public override Stream OpenForDirectUpdate(Stream stream)
         {
             Stream result;
@@ -4827,7 +4821,7 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Disposes this instance.
+        ///     Disposes this instance.
         /// </summary>
         public override void Dispose()
         {
@@ -4837,10 +4831,25 @@ namespace TidyBackups.SharpZipLib.Zip
             }
         }
 
-        #region Instance Fields
+        #region Constructors
 
-        private MemoryStream finalStream_;
-        private MemoryStream temporaryStream_;
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="MemoryArchiveStorage" /> class.
+        /// </summary>
+        public MemoryArchiveStorage()
+            : base(FileUpdateMode.Direct)
+        {
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="MemoryArchiveStorage" /> class.
+        /// </summary>
+        /// <param name="updateMode">The <see cref="FileUpdateMode" /> to use</param>
+        /// <remarks>This constructor is for testing as memory streams dont really require safe mode.</remarks>
+        public MemoryArchiveStorage(FileUpdateMode updateMode)
+            : base(updateMode)
+        {
+        }
 
         #endregion
     }

@@ -21,28 +21,28 @@ using TidyBackups.Debug;
 namespace TidyBackups
 {
     /// <summary>
-    /// Main entry class for application.
+    ///     Main entry class for application.
     /// </summary>
     internal class UserInterface
     {
         /// <summary>
-        /// Main entry for application.
+        ///     Main entry for application.
         /// </summary>
         /// <param name="args"></param>
         private static void Main(string[] args)
         {
             try
             {
-                bool arch = false;
+                var arch = false;
                 string path = null;
-                int days = -1;
-                int preserve = -1;
-                bool safe = false;
+                var days = -1;
+                var preserve = -1;
+                var safe = false;
 
 #if MS_TEST
-            // TODO Build NUNIT test from this
-            //string filename = File.Name.GetName(path);
-            //string database = Naming.Default.Database(filename);
+    // TODO Build NUNIT test from this
+    //string filename = File.Name.GetName(path);
+    //string database = Naming.Default.Database(filename);
 #endif
 
                 if (args.Length == 0)
@@ -52,9 +52,9 @@ namespace TidyBackups
                 }
                 else
                 {
-                    for (int i = 0; i < args.Length; i++)
+                    for (var i = 0; i < args.Length; i++)
                     {
-                        string str = args[i].ToUpper();
+                        var str = args[i].ToUpper();
                         if (str.StartsWith("/?"))
                         {
                             Help();
@@ -105,11 +105,11 @@ namespace TidyBackups
                         }
                     }
                 }
-                Validation validation = new Validation();
+                var validation = new Validation();
                 path = validation.Path(path);
                 if (path != null)
                 {
-                    int chk1 = preserve + days;
+                    var chk1 = preserve + days;
                     if (chk1 > -1)
                     {
                         if (Global.Debug)
@@ -133,12 +133,12 @@ namespace TidyBackups
             catch (OutOfMemoryException)
             {
                 Console.WriteLine("System is out of memory");
-            }           
+            }
         }
 
         /// <summary>
-        /// Prints help information to Console.
-        /// This information is displayed if no switches are supplied or if the /? switch is used.
+        ///     Prints help information to Console.
+        ///     This information is displayed if no switches are supplied or if the /? switch is used.
         /// </summary>
         internal static void Help()
         {
@@ -173,7 +173,7 @@ namespace TidyBackups
         }
 
         /// <summary>
-        /// Gets the setting from the command line.
+        ///     Gets the setting from the command line.
         /// </summary>
         /// <param name="commandParameters"></param>
         /// <param name="parameterName"></param>
@@ -182,9 +182,9 @@ namespace TidyBackups
         {
             try
             {
-                for (int i = 0; i < commandParameters.Length; i++)
+                for (var i = 0; i < commandParameters.Length; i++)
                 {
-                    string str = commandParameters[i];
+                    var str = commandParameters[i];
                     if (str.ToUpper().StartsWith(parameterName.ToUpper()))
                     {
                         if (parameterName == str)

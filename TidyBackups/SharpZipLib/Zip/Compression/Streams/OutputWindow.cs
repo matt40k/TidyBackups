@@ -41,34 +41,19 @@ using System;
 namespace TidyBackups.SharpZipLib.Zip.Compression.Streams
 {
     /// <summary>
-    /// Contains the output from the Inflation process.
-    /// We need to have a window so that we can refer backwards into the output stream
-    /// to repeat stuff.<br/>
-    /// Author of the original java version : John Leuner
+    ///     Contains the output from the Inflation process.
+    ///     We need to have a window so that we can refer backwards into the output stream
+    ///     to repeat stuff.<br />
+    ///     Author of the original java version : John Leuner
     /// </summary>
     public class OutputWindow
     {
-        #region Constants
-
-        private const int WindowSize = 1 << 15;
-        private const int WindowMask = WindowSize - 1;
-
-        #endregion
-
-        #region Instance Fields
-
-        private readonly byte[] window = new byte[WindowSize]; //The window is 2^15 bytes
-        private int windowEnd;
-        private int windowFilled;
-
-        #endregion
-
         /// <summary>
-        /// Write a byte to this output window
+        ///     Write a byte to this output window
         /// </summary>
         /// <param name="value">value to write</param>
         /// <exception cref="InvalidOperationException">
-        /// if window is full
+        ///     if window is full
         /// </exception>
         public void Write(int value)
         {
@@ -79,7 +64,6 @@ namespace TidyBackups.SharpZipLib.Zip.Compression.Streams
             window[windowEnd++] = (byte) value;
             windowEnd &= WindowMask;
         }
-
 
         private void SlowRepeat(int repStart, int length, int distance)
         {
@@ -92,12 +76,12 @@ namespace TidyBackups.SharpZipLib.Zip.Compression.Streams
         }
 
         /// <summary>
-        /// Append a byte pattern already in the window itself
+        ///     Append a byte pattern already in the window itself
         /// </summary>
         /// <param name="length">length of pattern to copy</param>
         /// <param name="distance">distance from end of window pattern occurs</param>
         /// <exception cref="InvalidOperationException">
-        /// If the repeated data overflows the window
+        ///     If the repeated data overflows the window
         /// </exception>
         public void Repeat(int length, int distance)
         {
@@ -106,8 +90,8 @@ namespace TidyBackups.SharpZipLib.Zip.Compression.Streams
                 throw new InvalidOperationException("Window full");
             }
 
-            int repStart = (windowEnd - distance) & WindowMask;
-            int border = WindowSize - length;
+            var repStart = (windowEnd - distance) & WindowMask;
+            var border = WindowSize - length;
             if ((repStart <= border) && (windowEnd < border))
             {
                 if (length <= distance)
@@ -131,7 +115,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression.Streams
         }
 
         /// <summary>
-        /// Copy from input manipulator to internal window
+        ///     Copy from input manipulator to internal window
         /// </summary>
         /// <param name="input">source of data</param>
         /// <param name="length">length of data to copy</param>
@@ -141,7 +125,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression.Streams
             length = Math.Min(Math.Min(length, WindowSize - windowFilled), input.AvailableBytes);
             int copied;
 
-            int tailLen = WindowSize - windowEnd;
+            var tailLen = WindowSize - windowEnd;
             if (length > tailLen)
             {
                 copied = input.CopyBytes(window, windowEnd, tailLen);
@@ -161,13 +145,13 @@ namespace TidyBackups.SharpZipLib.Zip.Compression.Streams
         }
 
         /// <summary>
-        /// Copy dictionary to window
+        ///     Copy dictionary to window
         /// </summary>
         /// <param name="dictionary">source dictionary</param>
         /// <param name="offset">offset of start in source dictionary</param>
         /// <param name="length">length of dictionary</param>
         /// <exception cref="InvalidOperationException">
-        /// If window isnt empty
+        ///     If window isnt empty
         /// </exception>
         public void CopyDict(byte[] dictionary, int offset, int length)
         {
@@ -191,7 +175,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression.Streams
         }
 
         /// <summary>
-        /// Get remaining unfilled space in window
+        ///     Get remaining unfilled space in window
         /// </summary>
         /// <returns>Number of bytes left in window</returns>
         public int GetFreeSpace()
@@ -200,7 +184,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression.Streams
         }
 
         /// <summary>
-        /// Get bytes available for output in window
+        ///     Get bytes available for output in window
         /// </summary>
         /// <returns>Number of bytes filled</returns>
         public int GetAvailable()
@@ -209,18 +193,18 @@ namespace TidyBackups.SharpZipLib.Zip.Compression.Streams
         }
 
         /// <summary>
-        /// Copy contents of window to output
+        ///     Copy contents of window to output
         /// </summary>
         /// <param name="output">buffer to copy to</param>
         /// <param name="offset">offset to start at</param>
         /// <param name="len">number of bytes to count</param>
         /// <returns>The number of bytes copied</returns>
         /// <exception cref="InvalidOperationException">
-        /// If a window underflow occurs
+        ///     If a window underflow occurs
         /// </exception>
         public int CopyOutput(byte[] output, int offset, int len)
         {
-            int copyEnd = windowEnd;
+            var copyEnd = windowEnd;
             if (len > windowFilled)
             {
                 len = windowFilled;
@@ -230,8 +214,8 @@ namespace TidyBackups.SharpZipLib.Zip.Compression.Streams
                 copyEnd = (windowEnd - windowFilled + len) & WindowMask;
             }
 
-            int copied = len;
-            int tailLen = len - copyEnd;
+            var copied = len;
+            var tailLen = len - copyEnd;
 
             if (tailLen > 0)
             {
@@ -249,11 +233,26 @@ namespace TidyBackups.SharpZipLib.Zip.Compression.Streams
         }
 
         /// <summary>
-        /// Reset by clearing window so <see cref="GetAvailable">GetAvailable</see> returns 0
+        ///     Reset by clearing window so <see cref="GetAvailable">GetAvailable</see> returns 0
         /// </summary>
         public void Reset()
         {
             windowFilled = windowEnd = 0;
         }
+
+        #region Constants
+
+        private const int WindowSize = 1 << 15;
+        private const int WindowMask = WindowSize - 1;
+
+        #endregion
+
+        #region Instance Fields
+
+        private readonly byte[] window = new byte[WindowSize]; //The window is 2^15 bytes
+        private int windowEnd;
+        private int windowFilled;
+
+        #endregion
     }
 }

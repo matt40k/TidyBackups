@@ -27,7 +27,7 @@ namespace TidyBackups.Debug
             get
             {
                 Thread.GetDomain().SetPrincipalPolicy(PrincipalPolicy.WindowsPrincipal);
-                return ((WindowsPrincipal)Thread.CurrentPrincipal).IsInRole(WindowsBuiltInRole.Administrator);
+                return ((WindowsPrincipal) Thread.CurrentPrincipal).IsInRole(WindowsBuiltInRole.Administrator);
             }
         }
     }

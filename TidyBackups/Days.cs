@@ -1,21 +1,22 @@
 ﻿using System;
 using System.IO;
+using TidyBackups.Item;
 
 namespace TidyBackups
 {
-    static class Days
+    internal static class Days
     {
-        static public int Age(string TBfile)
+        public static int Age(string TBfile)
         {
             // Sets default
-            int value = 99999;
-            DateTime TBfileTS = new DateTime(9999, 12, 30, 12, 59, 59);
-            DateTime Today = DateTime.Now;
+            var value = 99999;
+            var TBfileTS = new DateTime(9999, 12, 30, 12, 59, 59);
+            var Today = DateTime.Now;
 
             if (File.Exists(TBfile))
             {
-                TBfileTS = Item.Stamp.Get(TBfile);
-                TimeSpan diff = Today.Subtract(TBfileTS);
+                TBfileTS = Stamp.Get(TBfile);
+                var diff = Today.Subtract(TBfileTS);
                 value = diff.Days;
             }
             else
@@ -24,8 +25,8 @@ namespace TidyBackups
                 Console.WriteLine(TBfile + " does not exist - Error at Tidybackups.Days.Age");
             }
 
-#if MS_TEST  
-            // DEBUG
+#if MS_TEST
+    // DEBUG
             Console.WriteLine(value);
             Console.ReadLine();
 #endif

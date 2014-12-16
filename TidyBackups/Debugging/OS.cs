@@ -23,10 +23,7 @@ namespace TidyBackups.Debug
     {
         protected internal static string Version
         {
-            get
-            {
-                return Environment.OSVersion.VersionString;
-            }
+            get { return Environment.OSVersion.VersionString; }
         }
     }
 }

@@ -21,12 +21,12 @@ using System.IO;
 namespace TidyBackups.Item
 {
     /// <summary>
-    /// Delete class.
+    ///     Delete class.
     /// </summary>
     internal class Rename
     {
         /// <summary>
-        /// Actually deletes the file.
+        ///     Actually deletes the file.
         /// </summary>
         /// <param name="path"></param>
         protected internal static void Delete(string path)

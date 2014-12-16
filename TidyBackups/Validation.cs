@@ -15,7 +15,6 @@
  * along with TidyBackups.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using System;
 using System.IO;
 
 namespace TidyBackups
@@ -24,7 +23,10 @@ namespace TidyBackups
     {
         public string Path(string dir)
         {
-            if (Directory.Exists(dir)) { return dir; }
+            if (Directory.Exists(dir))
+            {
+                return dir;
+            }
             return null;
         }
     }

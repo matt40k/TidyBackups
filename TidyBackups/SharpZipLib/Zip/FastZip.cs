@@ -34,57 +34,45 @@
 // exception statement from your version.
 
 using System;
-using System.Collections;
 using System.IO;
 using TidyBackups.SharpZipLib.Core;
 
 namespace TidyBackups.SharpZipLib.Zip
 {
     /// <summary>
-    /// FastZipEvents supports all events applicable to <see cref="FastZip">FastZip</see> operations.
+    ///     FastZipEvents supports all events applicable to <see cref="FastZip">FastZip</see> operations.
     /// </summary>
     public class FastZipEvents
     {
         /// <summary>
-        /// Delegate to invoke when processing for a file has been completed.
+        ///     Delegate to invoke when processing for a file has been completed.
         /// </summary>
         public CompletedFileHandler CompletedFile;
 
         /// <summary>
-        /// Delegate to invoke when processing directory failures.
+        ///     Delegate to invoke when processing directory failures.
         /// </summary>
         public DirectoryFailureHandler DirectoryFailure;
 
         /// <summary>
-        /// Delegate to invoke when processing file failures.
+        ///     Delegate to invoke when processing file failures.
         /// </summary>
         public FileFailureHandler FileFailure;
 
         /// <summary>
-        /// Delegate to invoke when processing directories.
+        ///     Delegate to invoke when processing directories.
         /// </summary>
         public ProcessDirectoryHandler ProcessDirectory;
 
         /// <summary>
-        /// Delegate to invoke when processing files.
+        ///     Delegate to invoke when processing files.
         /// </summary>
         public ProcessFileHandler ProcessFile;
 
         /// <summary>
-        /// Delegate to invoke during processing of files.
+        ///     Delegate to invoke during processing of files.
         /// </summary>
         public ProgressHandler Progress;
-
-        /// <summary>
-        /// The minimum timespan between <see cref="Progress"/> events.
-        /// </summary>
-        /// <value>The minimum period of time between <see cref="Progress"/> events.</value>
-        /// <seealso cref="Progress"/>
-        public TimeSpan ProgressInterval
-        {
-            get { return progressInterval_; }
-            set { progressInterval_ = value; }
-        }
 
         #region Instance Fields
 
@@ -93,15 +81,26 @@ namespace TidyBackups.SharpZipLib.Zip
         #endregion
 
         /// <summary>
-        /// Raise the <see cref="DirectoryFailure">directory failure</see> event.
+        ///     The minimum timespan between <see cref="Progress" /> events.
+        /// </summary>
+        /// <value>The minimum period of time between <see cref="Progress" /> events.</value>
+        /// <seealso cref="Progress" />
+        public TimeSpan ProgressInterval
+        {
+            get { return progressInterval_; }
+            set { progressInterval_ = value; }
+        }
+
+        /// <summary>
+        ///     Raise the <see cref="DirectoryFailure">directory failure</see> event.
         /// </summary>
         /// <param name="directory">The directory causing the failure.</param>
         /// <param name="e">The exception for this event.</param>
         /// <returns>A boolean indicating if execution should continue or not.</returns>
         public bool OnDirectoryFailure(string directory, Exception e)
         {
-            bool result = false;
-            DirectoryFailureHandler handler = DirectoryFailure;
+            var result = false;
+            var handler = DirectoryFailure;
 
             if (handler != null)
             {
@@ -113,15 +112,15 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Raises the <see cref="FileFailure">file failure delegate</see>.
+        ///     Raises the <see cref="FileFailure">file failure delegate</see>.
         /// </summary>
         /// <param name="file">The file causing the failure.</param>
         /// <param name="e">The exception for this failure.</param>
         /// <returns>A boolean indicating if execution should continue or not.</returns>
         public bool OnFileFailure(string file, Exception e)
         {
-            FileFailureHandler handler = FileFailure;
-            bool result = (handler != null);
+            var handler = FileFailure;
+            var result = (handler != null);
 
             if (result)
             {
@@ -133,14 +132,14 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Fires the <see cref="ProcessFile">Process File delegate</see>.
+        ///     Fires the <see cref="ProcessFile">Process File delegate</see>.
         /// </summary>
         /// <param name="file">The file being processed.</param>
         /// <returns>A boolean indicating if execution should continue or not.</returns>
         public bool OnProcessFile(string file)
         {
-            bool result = true;
-            ProcessFileHandler handler = ProcessFile;
+            var result = true;
+            var handler = ProcessFile;
 
             if (handler != null)
             {
@@ -152,14 +151,14 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Fires the CompletedFile delegate
+        ///     Fires the CompletedFile delegate
         /// </summary>
         /// <param name="file">The file whose processing has been completed.</param>
         /// <returns>A boolean indicating if execution should continue or not.</returns>
         public bool OnCompletedFile(string file)
         {
-            bool result = true;
-            CompletedFileHandler handler = CompletedFile;
+            var result = true;
+            var handler = CompletedFile;
             if (handler != null)
             {
                 var args = new ScanEventArgs(file);
@@ -170,15 +169,15 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Fires the <see cref="ProcessDirectory">process directory</see> delegate.
+        ///     Fires the <see cref="ProcessDirectory">process directory</see> delegate.
         /// </summary>
         /// <param name="directory">The directory being processed.</param>
         /// <param name="hasMatchingFiles">Flag indicating if the directory has matching files as determined by the current filter.</param>
-        /// <returns>A <see cref="bool"/> of true if the operation should continue; false otherwise.</returns>
+        /// <returns>A <see cref="bool" /> of true if the operation should continue; false otherwise.</returns>
         public bool OnProcessDirectory(string directory, bool hasMatchingFiles)
         {
-            bool result = true;
-            ProcessDirectoryHandler handler = ProcessDirectory;
+            var result = true;
+            var handler = ProcessDirectory;
             if (handler != null)
             {
                 var args = new DirectoryEventArgs(directory, hasMatchingFiles);
@@ -190,27 +189,29 @@ namespace TidyBackups.SharpZipLib.Zip
     }
 
     /// <summary>
-    /// FastZip provides facilities for creating and extracting zip files.
+    ///     FastZip provides facilities for creating and extracting zip files.
     /// </summary>
     public class FastZip
     {
         #region Enumerations
 
         /// <summary>
-        /// Defines the desired handling when overwriting files during extraction.
+        ///     Defines the desired handling when overwriting files during extraction.
         /// </summary>
         public enum Overwrite
         {
             /// <summary>
-            /// Prompt the user to confirm overwriting
+            ///     Prompt the user to confirm overwriting
             /// </summary>
             Prompt,
+
             /// <summary>
-            /// Never overwrite files.
+            ///     Never overwrite files.
             /// </summary>
             Never,
+
             /// <summary>
-            /// Always overwrite files.
+            ///     Always overwrite files.
             /// </summary>
             Always
         }
@@ -220,14 +221,14 @@ namespace TidyBackups.SharpZipLib.Zip
         #region Constructors
 
         /// <summary>
-        /// Initialise a default instance of <see cref="FastZip"/>.
+        ///     Initialise a default instance of <see cref="FastZip" />.
         /// </summary>
         public FastZip()
         {
         }
 
         /// <summary>
-        /// Initialise a new instance of <see cref="FastZip"/>
+        ///     Initialise a new instance of <see cref="FastZip" />
         /// </summary>
         /// <param name="events">The <see cref="FastZipEvents">events</see> to use during operations.</param>
         public FastZip(FastZipEvents events)
@@ -240,23 +241,19 @@ namespace TidyBackups.SharpZipLib.Zip
         #region Properties
 
         /// <summary>
-        /// Get/set a value indicating wether empty directories should be created.
+        ///     Get/set a value indicating wether empty directories should be created.
         /// </summary>
         public bool CreateEmptyDirectories { get; set; }
 
 #if !NETCF_1_0
         /// <summary>
-        /// Get / set the password value.
+        ///     Get / set the password value.
         /// </summary>
-        public string Password
-        {
-            get { return password_; }
-            set { password_ = value; }
-        }
+        public string Password { get; set; }
 #endif
 
         /// <summary>
-        /// Get or set the <see cref="INameTransform"></see> active when creating Zip files.
+        ///     Get or set the <see cref="INameTransform"></see> active when creating Zip files.
         /// </summary>
         /// <seealso cref="EntryFactory"></seealso>
         public INameTransform NameTransform
@@ -266,7 +263,7 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Get or set the <see cref="IEntryFactory"></see> active when creating Zip files.
+        ///     Get or set the <see cref="IEntryFactory"></see> active when creating Zip files.
         /// </summary>
         public IEntryFactory EntryFactory
         {
@@ -285,15 +282,15 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Gets or sets the setting for <see cref="UseZip64">Zip64 handling when writing.</see>
+        ///     Gets or sets the setting for <see cref="UseZip64">Zip64 handling when writing.</see>
         /// </summary>
         /// <remarks>
-        /// The default value is dynamic which is not backwards compatible with old
-        /// programs and can cause problems with XP's built in compression which cant
-        /// read Zip64 archives. However it does avoid the situation were a large file
-        /// is added and cannot be completed correctly.
-        /// NOTE: Setting the size for entries before they are added is the best solution!
-        /// By default the EntryFactory used by FastZip will set fhe file size.
+        ///     The default value is dynamic which is not backwards compatible with old
+        ///     programs and can cause problems with XP's built in compression which cant
+        ///     read Zip64 archives. However it does avoid the situation were a large file
+        ///     is added and cannot be completed correctly.
+        ///     NOTE: Setting the size for entries before they are added is the best solution!
+        ///     By default the EntryFactory used by FastZip will set fhe file size.
         /// </remarks>
         public UseZip64 UseZip64
         {
@@ -302,19 +299,15 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Get/set a value indicating wether file dates and times should 
-        /// be restored when extracting files from an archive.
+        ///     Get/set a value indicating wether file dates and times should
+        ///     be restored when extracting files from an archive.
         /// </summary>
         /// <remarks>The default value is false.</remarks>
-        public bool RestoreDateTimeOnExtract
-        {
-            get { return restoreDateTimeOnExtract_; }
-            set { restoreDateTimeOnExtract_ = value; }
-        }
+        public bool RestoreDateTimeOnExtract { get; set; }
 
         /// <summary>
-        /// Get/set a value indicating wether file attributes should
-        /// be restored during extract operations
+        ///     Get/set a value indicating wether file attributes should
+        ///     be restored during extract operations
         /// </summary>
         public bool RestoreAttributesOnExtract { get; set; }
 
@@ -323,7 +316,7 @@ namespace TidyBackups.SharpZipLib.Zip
         #region Delegates
 
         /// <summary>
-        /// Delegate called when confirming overwriting of files.
+        ///     Delegate called when confirming overwriting of files.
         /// </summary>
         public delegate bool ConfirmOverwriteDelegate(string fileName);
 
@@ -332,7 +325,7 @@ namespace TidyBackups.SharpZipLib.Zip
         #region CreateZip
 
         /// <summary>
-        /// Create a zip file.
+        ///     Create a zip file.
         /// </summary>
         /// <param name="zipFileName">The name of the zip file to create.</param>
         /// <param name="sourceDirectory">The directory to source files from.</param>
@@ -340,13 +333,13 @@ namespace TidyBackups.SharpZipLib.Zip
         /// <param name="fileFilter">The <see cref="PathFilter">file filter</see> to apply.</param>
         /// <param name="directoryFilter">The <see cref="PathFilter">directory filter</see> to apply.</param>
         public void CreateZip(string zipFileName, string sourceDirectory,
-                              bool recurse, string fileFilter, string directoryFilter)
+            bool recurse, string fileFilter, string directoryFilter)
         {
-            CreateZip(System.IO.File.Create(zipFileName), sourceDirectory, recurse, fileFilter, directoryFilter);
+            CreateZip(File.Create(zipFileName), sourceDirectory, recurse, fileFilter, directoryFilter);
         }
 
         /// <summary>
-        /// Create a zip file/archive.
+        ///     Create a zip file/archive.
         /// </summary>
         /// <param name="zipFileName">The name of the zip file to create.</param>
         /// <param name="sourceDirectory">The directory to obtain files and directories from.</param>
@@ -354,11 +347,11 @@ namespace TidyBackups.SharpZipLib.Zip
         /// <param name="fileFilter">The file filter to apply.</param>
         public void CreateZip(string zipFileName, string sourceDirectory, bool recurse, string fileFilter)
         {
-            CreateZip(System.IO.File.Create(zipFileName), sourceDirectory, recurse, fileFilter, null);
+            CreateZip(File.Create(zipFileName), sourceDirectory, recurse, fileFilter, null);
         }
 
         /// <summary>
-        /// Create a zip archive sending output to the <paramref name="outputStream"/> passed.
+        ///     Create a zip archive sending output to the <paramref name="outputStream" /> passed.
         /// </summary>
         /// <param name="outputStream">The stream to write archive data to.</param>
         /// <param name="sourceDirectory">The directory to source files from.</param>
@@ -366,7 +359,7 @@ namespace TidyBackups.SharpZipLib.Zip
         /// <param name="fileFilter">The <see cref="PathFilter">file filter</see> to apply.</param>
         /// <param name="directoryFilter">The <see cref="PathFilter">directory filter</see> to apply.</param>
         public void CreateZip(Stream outputStream, string sourceDirectory, bool recurse, string fileFilter,
-                              string directoryFilter)
+            string directoryFilter)
         {
             NameTransform = new ZipNameTransform(sourceDirectory);
             sourceDirectory_ = sourceDirectory;
@@ -374,9 +367,9 @@ namespace TidyBackups.SharpZipLib.Zip
             using (outputStream_ = new ZipOutputStream(outputStream))
             {
 #if !NETCF_1_0
-                if (password_ != null)
+                if (Password != null)
                 {
-                    outputStream_.Password = password_;
+                    outputStream_.Password = Password;
                 }
 #endif
 
@@ -410,18 +403,18 @@ namespace TidyBackups.SharpZipLib.Zip
         #region ExtractZip
 
         /// <summary>
-        /// Extract the contents of a zip file.
+        ///     Extract the contents of a zip file.
         /// </summary>
         /// <param name="zipFileName">The zip file to extract from.</param>
         /// <param name="targetDirectory">The directory to save extracted information in.</param>
         /// <param name="fileFilter">A filter to apply to files.</param>
         public void ExtractZip(string zipFileName, string targetDirectory, string fileFilter)
         {
-            ExtractZip(zipFileName, targetDirectory, Overwrite.Always, null, fileFilter, null, restoreDateTimeOnExtract_);
+            ExtractZip(zipFileName, targetDirectory, Overwrite.Always, null, fileFilter, null, RestoreDateTimeOnExtract);
         }
 
         /// <summary>
-        /// Extract the contents of a zip file.
+        ///     Extract the contents of a zip file.
         /// </summary>
         /// <param name="zipFileName">The zip file to extract from.</param>
         /// <param name="targetDirectory">The directory to save extracted information in.</param>
@@ -431,8 +424,8 @@ namespace TidyBackups.SharpZipLib.Zip
         /// <param name="directoryFilter">A filter to apply to directories.</param>
         /// <param name="restoreDateTime">Flag indicating wether to restore the date and time for extracted files.</param>
         public void ExtractZip(string zipFileName, string targetDirectory,
-                               Overwrite overwrite, ConfirmOverwriteDelegate confirmDelegate,
-                               string fileFilter, string directoryFilter, bool restoreDateTime)
+            Overwrite overwrite, ConfirmOverwriteDelegate confirmDelegate,
+            string fileFilter, string directoryFilter, bool restoreDateTime)
         {
             if ((overwrite == Overwrite.Prompt) && (confirmDelegate == null))
             {
@@ -446,18 +439,18 @@ namespace TidyBackups.SharpZipLib.Zip
 
             fileFilter_ = new NameFilter(fileFilter);
             directoryFilter_ = new NameFilter(directoryFilter);
-            restoreDateTimeOnExtract_ = restoreDateTime;
+            RestoreDateTimeOnExtract = restoreDateTime;
 
             using (zipFile_ = new ZipFile(zipFileName))
             {
 #if !NETCF_1_0
-                if (password_ != null)
+                if (Password != null)
                 {
-                    zipFile_.Password = password_;
+                    zipFile_.Password = Password;
                 }
 #endif
 
-                IEnumerator enumerator = zipFile_.GetEnumerator();
+                var enumerator = zipFile_.GetEnumerator();
                 while (continueRunning_ && enumerator.MoveNext())
                 {
                     var entry = (ZipEntry) enumerator.Current;
@@ -476,10 +469,6 @@ namespace TidyBackups.SharpZipLib.Zip
                         {
                             ExtractEntry(entry);
                         }
-                    }
-                    else
-                    {
-                        // Do nothing for volume labels etc...
                     }
                 }
             }
@@ -502,7 +491,7 @@ namespace TidyBackups.SharpZipLib.Zip
                 {
                     if (e.Name != sourceDirectory_)
                     {
-                        ZipEntry entry = entryFactory_.MakeDirectoryEntry(e.Name);
+                        var entry = entryFactory_.MakeDirectoryEntry(e.Name);
                         outputStream_.PutNextEntry(entry);
                     }
                 }
@@ -518,9 +507,9 @@ namespace TidyBackups.SharpZipLib.Zip
 
             if (e.ContinueRunning)
             {
-                using (FileStream stream = System.IO.File.OpenRead(e.Name))
+                using (var stream = File.OpenRead(e.Name))
                 {
-                    ZipEntry entry = entryFactory_.MakeFileEntry(e.Name);
+                    var entry = entryFactory_.MakeFileEntry(e.Name);
                     outputStream_.PutNextEntry(entry);
                     AddFileContents(e.Name, stream);
                 }
@@ -542,7 +531,7 @@ namespace TidyBackups.SharpZipLib.Zip
             if ((events_ != null) && (events_.Progress != null))
             {
                 StreamUtils.Copy(stream, outputStream_, buffer_,
-                                 events_.Progress, events_.ProgressInterval, this, name);
+                    events_.Progress, events_.ProgressInterval, this, name);
             }
             else
             {
@@ -557,10 +546,10 @@ namespace TidyBackups.SharpZipLib.Zip
 
         private void ExtractFileEntry(ZipEntry entry, string targetName)
         {
-            bool proceed = true;
+            var proceed = true;
             if (overwrite_ != Overwrite.Always)
             {
-                if (System.IO.File.Exists(targetName))
+                if (File.Exists(targetName))
                 {
                     if ((overwrite_ == Overwrite.Prompt) && (confirmDelegate_ != null))
                     {
@@ -584,7 +573,7 @@ namespace TidyBackups.SharpZipLib.Zip
                 {
                     try
                     {
-                        using (FileStream outputStream = System.IO.File.Create(targetName))
+                        using (var outputStream = File.Create(targetName))
                         {
                             if (buffer_ == null)
                             {
@@ -593,8 +582,8 @@ namespace TidyBackups.SharpZipLib.Zip
                             if ((events_ != null) && (events_.Progress != null))
                             {
                                 StreamUtils.Copy(zipFile_.GetInputStream(entry), outputStream, buffer_,
-                                                 events_.Progress, events_.ProgressInterval, this, entry.Name,
-                                                 entry.Size);
+                                    events_.Progress, events_.ProgressInterval, this, entry.Name,
+                                    entry.Size);
                             }
                             else
                             {
@@ -608,9 +597,9 @@ namespace TidyBackups.SharpZipLib.Zip
                         }
 
 #if !NETCF_1_0 && !NETCF_2_0
-                        if (restoreDateTimeOnExtract_)
+                        if (RestoreDateTimeOnExtract)
                         {
-                            System.IO.File.SetLastWriteTime(targetName, entry.DateTime);
+                            File.SetLastWriteTime(targetName, entry.DateTime);
                         }
 
                         if (RestoreAttributesOnExtract && entry.IsDOSEntry && (entry.ExternalFileAttributes != -1))
@@ -619,7 +608,7 @@ namespace TidyBackups.SharpZipLib.Zip
                             // TODO: FastZip - Setting of other file attributes on extraction is a little trickier.
                             fileAttributes &= (FileAttributes.Archive | FileAttributes.Normal | FileAttributes.ReadOnly |
                                                FileAttributes.Hidden);
-                            System.IO.File.SetAttributes(targetName, fileAttributes);
+                            File.SetAttributes(targetName, fileAttributes);
                         }
 #endif
                     }
@@ -641,8 +630,8 @@ namespace TidyBackups.SharpZipLib.Zip
 
         private void ExtractEntry(ZipEntry entry)
         {
-            bool doExtraction = entry.IsCompressionMethodSupported();
-            string targetName = entry.Name;
+            var doExtraction = entry.IsCompressionMethodSupported();
+            var targetName = entry.Name;
 
             if (doExtraction)
             {
@@ -746,14 +735,12 @@ namespace TidyBackups.SharpZipLib.Zip
         private Overwrite overwrite_;
         private ConfirmOverwriteDelegate confirmDelegate_;
 
-        private bool restoreDateTimeOnExtract_;
         private readonly FastZipEvents events_;
         private IEntryFactory entryFactory_ = new ZipEntryFactory();
         private INameTransform extractNameTransform_;
         private UseZip64 useZip64_ = UseZip64.Dynamic;
 
 #if !NETCF_1_0
-        private string password_;
 #endif
 
         #endregion

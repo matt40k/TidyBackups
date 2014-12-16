@@ -20,12 +20,12 @@ using System.IO;
 namespace TidyBackups.Item
 {
     /// <summary>
-    /// File.Size Class
+    ///     File.Size Class
     /// </summary>
     internal class Size
     {
         /// <summary>
-        /// Gets the file size from the file.
+        ///     Gets the file size from the file.
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>

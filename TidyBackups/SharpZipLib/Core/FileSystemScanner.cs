@@ -43,14 +43,14 @@ namespace TidyBackups.SharpZipLib.Core
     #region EventArgs
 
     /// <summary>
-    /// Event arguments for scanning.
+    ///     Event arguments for scanning.
     /// </summary>
     public class ScanEventArgs : EventArgs
     {
         #region Constructors
 
         /// <summary>
-        /// Initialise a new instance of <see cref="ScanEventArgs"/>
+        ///     Initialise a new instance of <see cref="ScanEventArgs" />
         /// </summary>
         /// <param name="name">The file or directory name.</param>
         public ScanEventArgs(string name)
@@ -61,7 +61,7 @@ namespace TidyBackups.SharpZipLib.Core
         #endregion
 
         /// <summary>
-        /// The file or directory name for this event.
+        ///     The file or directory name for this event.
         /// </summary>
         public string Name
         {
@@ -69,7 +69,7 @@ namespace TidyBackups.SharpZipLib.Core
         }
 
         /// <summary>
-        /// Get set a value indicating if scanning should continue or not.
+        ///     Get set a value indicating if scanning should continue or not.
         /// </summary>
         public bool ContinueRunning
         {
@@ -86,14 +86,14 @@ namespace TidyBackups.SharpZipLib.Core
     }
 
     /// <summary>
-    /// Event arguments during processing of a single file or directory.
+    ///     Event arguments during processing of a single file or directory.
     /// </summary>
     public class ProgressEventArgs : EventArgs
     {
         #region Constructors
 
         /// <summary>
-        /// Initialise a new instance of <see cref="ScanEventArgs"/>
+        ///     Initialise a new instance of <see cref="ScanEventArgs" />
         /// </summary>
         /// <param name="name">The file or directory name if known.</param>
         /// <param name="processed">The number of bytes processed so far</param>
@@ -108,7 +108,7 @@ namespace TidyBackups.SharpZipLib.Core
         #endregion
 
         /// <summary>
-        /// The name for this event if known.
+        ///     The name for this event if known.
         /// </summary>
         public string Name
         {
@@ -116,7 +116,7 @@ namespace TidyBackups.SharpZipLib.Core
         }
 
         /// <summary>
-        /// Get set a value indicating wether scanning should continue or not.
+        ///     Get set a value indicating wether scanning should continue or not.
         /// </summary>
         public bool ContinueRunning
         {
@@ -125,7 +125,7 @@ namespace TidyBackups.SharpZipLib.Core
         }
 
         /// <summary>
-        /// Get a percentage representing how much of the <see cref="Target"></see> has been processed
+        ///     Get a percentage representing how much of the <see cref="Target"></see> has been processed
         /// </summary>
         /// <value>0.0 to 100.0 percent; 0 if target is not known.</value>
         public float PercentComplete
@@ -136,15 +136,12 @@ namespace TidyBackups.SharpZipLib.Core
                 {
                     return 0;
                 }
-                else
-                {
-                    return (processed_/(float) target_)*100.0f;
-                }
+                return (processed_/(float) target_)*100.0f;
             }
         }
 
         /// <summary>
-        /// The number of bytes processed so far
+        ///     The number of bytes processed so far
         /// </summary>
         public long Processed
         {
@@ -152,7 +149,7 @@ namespace TidyBackups.SharpZipLib.Core
         }
 
         /// <summary>
-        /// The number of bytes to process.
+        ///     The number of bytes to process.
         /// </summary>
         /// <remarks>Target may be 0 or negative if the value isnt known.</remarks>
         public long Target
@@ -171,14 +168,20 @@ namespace TidyBackups.SharpZipLib.Core
     }
 
     /// <summary>
-    /// Event arguments for directories.
+    ///     Event arguments for directories.
     /// </summary>
     public class DirectoryEventArgs : ScanEventArgs
     {
+        #region Instance Fields
+
+        private readonly bool hasMatchingFiles_;
+
+        #endregion
+
         #region Constructors
 
         /// <summary>
-        /// Initialize an instance of <see cref="DirectoryEventArgs"></see>.
+        ///     Initialize an instance of <see cref="DirectoryEventArgs"></see>.
         /// </summary>
         /// <param name="name">The name for this directory.</param>
         /// <param name="hasMatchingFiles">Flag value indicating if any matching files are contained in this directory.</param>
@@ -191,29 +194,23 @@ namespace TidyBackups.SharpZipLib.Core
         #endregion
 
         /// <summary>
-        /// Get a value indicating if the directory contains any matching files or not.
+        ///     Get a value indicating if the directory contains any matching files or not.
         /// </summary>
         public bool HasMatchingFiles
         {
             get { return hasMatchingFiles_; }
         }
-
-        #region Instance Fields
-
-        private readonly bool hasMatchingFiles_;
-
-        #endregion
     }
 
     /// <summary>
-    /// Arguments passed when scan failures are detected.
+    ///     Arguments passed when scan failures are detected.
     /// </summary>
     public class ScanFailureEventArgs : EventArgs
     {
         #region Constructors
 
         /// <summary>
-        /// Initialise a new instance of <see cref="ScanFailureEventArgs"></see>
+        ///     Initialise a new instance of <see cref="ScanFailureEventArgs"></see>
         /// </summary>
         /// <param name="name">The name to apply.</param>
         /// <param name="e">The exception to use.</param>
@@ -227,7 +224,7 @@ namespace TidyBackups.SharpZipLib.Core
         #endregion
 
         /// <summary>
-        /// The applicable name.
+        ///     The applicable name.
         /// </summary>
         public string Name
         {
@@ -235,7 +232,7 @@ namespace TidyBackups.SharpZipLib.Core
         }
 
         /// <summary>
-        /// The applicable exception.
+        ///     The applicable exception.
         /// </summary>
         public Exception Exception
         {
@@ -243,7 +240,7 @@ namespace TidyBackups.SharpZipLib.Core
         }
 
         /// <summary>
-        /// Get / set a value indicating wether scanning should continue.
+        ///     Get / set a value indicating wether scanning should continue.
         /// </summary>
         public bool ContinueRunning { get; set; }
 
@@ -260,40 +257,40 @@ namespace TidyBackups.SharpZipLib.Core
     #region Delegates
 
     /// <summary>
-    /// Delegate invoked before starting to process a directory.
+    ///     Delegate invoked before starting to process a directory.
     /// </summary>
     public delegate void ProcessDirectoryHandler(object sender, DirectoryEventArgs e);
 
     /// <summary>
-    /// Delegate invoked before starting to process a file.
+    ///     Delegate invoked before starting to process a file.
     /// </summary>
     /// <param name="sender">The source of the event</param>
     /// <param name="e">The event arguments.</param>
     public delegate void ProcessFileHandler(object sender, ScanEventArgs e);
 
     /// <summary>
-    /// Delegate invoked during processing of a file or directory
+    ///     Delegate invoked during processing of a file or directory
     /// </summary>
     /// <param name="sender">The source of the event</param>
     /// <param name="e">The event arguments.</param>
     public delegate void ProgressHandler(object sender, ProgressEventArgs e);
 
     /// <summary>
-    /// Delegate invoked when a file has been completely processed.
+    ///     Delegate invoked when a file has been completely processed.
     /// </summary>
     /// <param name="sender">The source of the event</param>
     /// <param name="e">The event arguments.</param>
     public delegate void CompletedFileHandler(object sender, ScanEventArgs e);
 
     /// <summary>
-    /// Delegate invoked when a directory failure is detected.
+    ///     Delegate invoked when a directory failure is detected.
     /// </summary>
     /// <param name="sender">The source of the event</param>
     /// <param name="e">The event arguments.</param>
     public delegate void DirectoryFailureHandler(object sender, ScanFailureEventArgs e);
 
     /// <summary>
-    /// Delegate invoked when a file failure is detected.
+    ///     Delegate invoked when a file failure is detected.
     /// </summary>
     /// <param name="sender">The source of the event</param>
     /// <param name="e">The event arguments.</param>
@@ -302,88 +299,44 @@ namespace TidyBackups.SharpZipLib.Core
     #endregion
 
     /// <summary>
-    /// FileSystemScanner provides facilities scanning of files and directories.
+    ///     FileSystemScanner provides facilities scanning of files and directories.
     /// </summary>
     public class FileSystemScanner
     {
-        #region Constructors
-
         /// <summary>
-        /// Initialise a new instance of <see cref="FileSystemScanner"></see>
-        /// </summary>
-        /// <param name="filter">The <see cref="PathFilter">file filter</see> to apply when scanning.</param>
-        public FileSystemScanner(string filter)
-        {
-            fileFilter_ = new PathFilter(filter);
-        }
-
-        /// <summary>
-        /// Initialise a new instance of <see cref="FileSystemScanner"></see>
-        /// </summary>
-        /// <param name="fileFilter">The <see cref="PathFilter">file filter</see> to apply.</param>
-        /// <param name="directoryFilter">The <see cref="PathFilter"> directory filter</see> to apply.</param>
-        public FileSystemScanner(string fileFilter, string directoryFilter)
-        {
-            fileFilter_ = new PathFilter(fileFilter);
-            directoryFilter_ = new PathFilter(directoryFilter);
-        }
-
-        /// <summary>
-        /// Initialise a new instance of <see cref="FileSystemScanner"></see>
-        /// </summary>
-        /// <param name="fileFilter">The file <see cref="IScanFilter">filter</see> to apply.</param>
-        public FileSystemScanner(IScanFilter fileFilter)
-        {
-            fileFilter_ = fileFilter;
-        }
-
-        /// <summary>
-        /// Initialise a new instance of <see cref="FileSystemScanner"></see>
-        /// </summary>
-        /// <param name="fileFilter">The file <see cref="IScanFilter">filter</see>  to apply.</param>
-        /// <param name="directoryFilter">The directory <see cref="IScanFilter">filter</see>  to apply.</param>
-        public FileSystemScanner(IScanFilter fileFilter, IScanFilter directoryFilter)
-        {
-            fileFilter_ = fileFilter;
-            directoryFilter_ = directoryFilter;
-        }
-
-        #endregion
-
-        /// <summary>
-        /// Delegate to invoke when processing for a file has finished.
+        ///     Delegate to invoke when processing for a file has finished.
         /// </summary>
         public CompletedFileHandler CompletedFile;
 
         /// <summary>
-        /// Delegate to invoke when a directory failure is detected.
+        ///     Delegate to invoke when a directory failure is detected.
         /// </summary>
         public DirectoryFailureHandler DirectoryFailure;
 
         /// <summary>
-        /// Delegate to invoke when a file failure is detected.
+        ///     Delegate to invoke when a file failure is detected.
         /// </summary>
         public FileFailureHandler FileFailure;
 
         /// <summary>
-        /// Delegate to invoke when a directory is processed.
+        ///     Delegate to invoke when a directory is processed.
         /// </summary>
         public ProcessDirectoryHandler ProcessDirectory;
 
         /// <summary>
-        /// Delegate to invoke when a file is processed.
+        ///     Delegate to invoke when a file is processed.
         /// </summary>
         public ProcessFileHandler ProcessFile;
 
         /// <summary>
-        /// Raise the DirectoryFailure event.
+        ///     Raise the DirectoryFailure event.
         /// </summary>
         /// <param name="directory">The directory name.</param>
         /// <param name="e">The exception detected.</param>
         private bool OnDirectoryFailure(string directory, Exception e)
         {
-            DirectoryFailureHandler handler = DirectoryFailure;
-            bool result = (handler != null);
+            var handler = DirectoryFailure;
+            var result = (handler != null);
             if (result)
             {
                 var args = new ScanFailureEventArgs(directory, e);
@@ -394,15 +347,15 @@ namespace TidyBackups.SharpZipLib.Core
         }
 
         /// <summary>
-        /// Raise the FileFailure event.
+        ///     Raise the FileFailure event.
         /// </summary>
         /// <param name="file">The file name.</param>
         /// <param name="e">The exception detected.</param>
         private bool OnFileFailure(string file, Exception e)
         {
-            FileFailureHandler handler = FileFailure;
+            var handler = FileFailure;
 
-            bool result = (handler != null);
+            var result = (handler != null);
 
             if (result)
             {
@@ -414,12 +367,12 @@ namespace TidyBackups.SharpZipLib.Core
         }
 
         /// <summary>
-        /// Raise the ProcessFile event.
+        ///     Raise the ProcessFile event.
         /// </summary>
         /// <param name="file">The file name.</param>
         private void OnProcessFile(string file)
         {
-            ProcessFileHandler handler = ProcessFile;
+            var handler = ProcessFile;
 
             if (handler != null)
             {
@@ -430,12 +383,12 @@ namespace TidyBackups.SharpZipLib.Core
         }
 
         /// <summary>
-        /// Raise the complete file event
+        ///     Raise the complete file event
         /// </summary>
         /// <param name="file">The file name</param>
         private void OnCompleteFile(string file)
         {
-            CompletedFileHandler handler = CompletedFile;
+            var handler = CompletedFile;
 
             if (handler != null)
             {
@@ -446,13 +399,13 @@ namespace TidyBackups.SharpZipLib.Core
         }
 
         /// <summary>
-        /// Raise the ProcessDirectory event.
+        ///     Raise the ProcessDirectory event.
         /// </summary>
         /// <param name="directory">The directory name.</param>
         /// <param name="hasMatchingFiles">Flag indicating if the directory has matching files.</param>
         private void OnProcessDirectory(string directory, bool hasMatchingFiles)
         {
-            ProcessDirectoryHandler handler = ProcessDirectory;
+            var handler = ProcessDirectory;
 
             if (handler != null)
             {
@@ -463,7 +416,7 @@ namespace TidyBackups.SharpZipLib.Core
         }
 
         /// <summary>
-        /// Scan a directory.
+        ///     Scan a directory.
         /// </summary>
         /// <param name="directory">The base directory to scan.</param>
         /// <param name="recurse">True to recurse subdirectories, false to scan a single directory.</param>
@@ -477,9 +430,9 @@ namespace TidyBackups.SharpZipLib.Core
         {
             try
             {
-                string[] names = Directory.GetFiles(directory);
-                bool hasMatch = false;
-                for (int fileIndex = 0; fileIndex < names.Length; ++fileIndex)
+                var names = Directory.GetFiles(directory);
+                var hasMatch = false;
+                for (var fileIndex = 0; fileIndex < names.Length; ++fileIndex)
                 {
                     if (!fileFilter_.IsMatch(names[fileIndex]))
                     {
@@ -495,7 +448,7 @@ namespace TidyBackups.SharpZipLib.Core
 
                 if (alive_ && hasMatch)
                 {
-                    foreach (string fileName in names)
+                    foreach (var fileName in names)
                     {
                         try
                         {
@@ -530,8 +483,8 @@ namespace TidyBackups.SharpZipLib.Core
             {
                 try
                 {
-                    string[] names = Directory.GetDirectories(directory);
-                    foreach (string fulldir in names)
+                    var names = Directory.GetDirectories(directory);
+                    foreach (var fulldir in names)
                     {
                         if ((directoryFilter_ == null) || (directoryFilter_.IsMatch(fulldir)))
                         {
@@ -553,20 +506,64 @@ namespace TidyBackups.SharpZipLib.Core
             }
         }
 
+        #region Constructors
+
+        /// <summary>
+        ///     Initialise a new instance of <see cref="FileSystemScanner"></see>
+        /// </summary>
+        /// <param name="filter">The <see cref="PathFilter">file filter</see> to apply when scanning.</param>
+        public FileSystemScanner(string filter)
+        {
+            fileFilter_ = new PathFilter(filter);
+        }
+
+        /// <summary>
+        ///     Initialise a new instance of <see cref="FileSystemScanner"></see>
+        /// </summary>
+        /// <param name="fileFilter">The <see cref="PathFilter">file filter</see> to apply.</param>
+        /// <param name="directoryFilter">The <see cref="PathFilter"> directory filter</see> to apply.</param>
+        public FileSystemScanner(string fileFilter, string directoryFilter)
+        {
+            fileFilter_ = new PathFilter(fileFilter);
+            directoryFilter_ = new PathFilter(directoryFilter);
+        }
+
+        /// <summary>
+        ///     Initialise a new instance of <see cref="FileSystemScanner"></see>
+        /// </summary>
+        /// <param name="fileFilter">The file <see cref="IScanFilter">filter</see> to apply.</param>
+        public FileSystemScanner(IScanFilter fileFilter)
+        {
+            fileFilter_ = fileFilter;
+        }
+
+        /// <summary>
+        ///     Initialise a new instance of <see cref="FileSystemScanner"></see>
+        /// </summary>
+        /// <param name="fileFilter">The file <see cref="IScanFilter">filter</see>  to apply.</param>
+        /// <param name="directoryFilter">The directory <see cref="IScanFilter">filter</see>  to apply.</param>
+        public FileSystemScanner(IScanFilter fileFilter, IScanFilter directoryFilter)
+        {
+            fileFilter_ = fileFilter;
+            directoryFilter_ = directoryFilter;
+        }
+
+        #endregion
+
         #region Instance Fields
 
         /// <summary>
-        /// The directory filter currently in use.
+        ///     The directory filter currently in use.
         /// </summary>
         private readonly IScanFilter directoryFilter_;
 
         /// <summary>
-        /// The file filter currently in use.
+        ///     The file filter currently in use.
         /// </summary>
         private readonly IScanFilter fileFilter_;
 
         /// <summary>
-        /// Flag indicating if scanning should continue running.
+        ///     Flag indicating if scanning should continue running.
         /// </summary>
         private bool alive_;
 

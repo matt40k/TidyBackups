@@ -20,12 +20,11 @@ using System.IO;
 namespace TidyBackups.Item
 {
     /// <summary>
-    /// 
     /// </summary>
     internal class Name
     {
         /// <summary>
-        /// Gets the file name from the file path.
+        ///     Gets the file name from the file path.
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
@@ -35,7 +34,7 @@ namespace TidyBackups.Item
         }
 
         /// <summary>
-        /// Gets the file extension from the file path.
+        ///     Gets the file extension from the file path.
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
@@ -45,7 +44,7 @@ namespace TidyBackups.Item
         }
 
         /// <summary>
-        /// Gets the directory from the file path.
+        ///     Gets the directory from the file path.
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
@@ -56,18 +55,18 @@ namespace TidyBackups.Item
 
         protected internal static string GetUncompress(string name)
         {
-            string value = GetName(name);
+            var value = GetName(name);
             return value.Replace(".zip", ".bak");
         }
 
         /// <summary>
-        /// Checks the file type.
+        ///     Checks the file type.
         /// </summary>
         /// <param name="ext"></param>
         /// <returns></returns>
         protected internal static bool Type(string path)
         {
-            string ext = Path.GetExtension(path);
+            var ext = Path.GetExtension(path);
             switch (ext)
             {
                 case ".dbk":
@@ -83,7 +82,7 @@ namespace TidyBackups.Item
 
         protected internal static bool ToCompress(string path)
         {
-            string ext = Path.GetExtension(path);
+            var ext = Path.GetExtension(path);
             switch (ext)
             {
                 case ".dbk":

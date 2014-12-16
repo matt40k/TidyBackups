@@ -16,7 +16,6 @@
  */
 
 using System;
-using TidyBackups;
 using TidyBackups.Item;
 
 namespace TidyBackups.Debug
@@ -38,15 +37,15 @@ namespace TidyBackups.Debug
             Message.Print("Free space: " + Disc.FreeSpace(path));
             Message.Print("Username: " + Environment.UserName);
             Message.Print("Domain: " + Environment.UserDomainName);
-            Message.Print("Arguments:" + Output.StrArg(args));
-            Message.Print("Days: " + (object)days);
+            Message.Print("Arguments:" + StrArg(args));
+            Message.Print("Days: " + days);
             Message.Print("Path: " + path);
             Files.Filtered(path);
             Message.Print("Path permission: " + Permissions.View(path));
-            Message.Print("Preserve: " + (object)preserve);
+            Message.Print("Preserve: " + preserve);
             Message.Print("Safe: " + safe);
             Message.Print("Archive: " + compress);
-            bool flag = true;
+            var flag = true;
             if (Message.Logfile == "")
                 flag = false;
             Message.Print("Log: " + flag);
@@ -58,10 +57,10 @@ namespace TidyBackups.Debug
 
         private static string StrArg(string[] args)
         {
-            string str1 = "";
-            for (int index = 0; index < args.Length; ++index)
+            var str1 = "";
+            for (var index = 0; index < args.Length; ++index)
             {
-                string str2 = args[index].ToUpper();
+                var str2 = args[index].ToUpper();
                 str1 = str1 + " " + str2;
             }
             return str1;

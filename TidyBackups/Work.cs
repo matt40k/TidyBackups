@@ -15,17 +15,14 @@
  * along with TidyBackups.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using System.Collections;
-
 namespace TidyBackups
 {
     /// <summary>
-    /// Work Class - contains most of the logic
+    ///     Work Class - contains most of the logic
     /// </summary>
     internal class Work
     {
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="path"></param>
         /// <param name="days"></param>
@@ -44,7 +41,7 @@ namespace TidyBackups
                 }
 
                 // Gets a list of files
-                ArrayList files = Filter.Filtered(path, preserve);
+                var files = Filter.Filtered(path, preserve);
 
 #if MS_TEST
                 foreach (string File in Files)

@@ -41,23 +41,15 @@ using TidyBackups.SharpZipLib.Core;
 namespace TidyBackups.SharpZipLib.Zip
 {
     /// <summary>
-    /// WindowsNameTransform transforms ZipFile names to windows compatible ones.
+    ///     WindowsNameTransform transforms ZipFile names to windows compatible ones.
     /// </summary>
     public class WindowsNameTransform : INameTransform
     {
         /// <summary>
-        ///  The maximum windows path name permitted.
+        ///     The maximum windows path name permitted.
         /// </summary>
         /// <remarks>This may not valid for all windows systems - CE?, etc but I cant find the equivalent in the CLR.</remarks>
         private const int MaxPath = 260;
-
-        #region Instance Fields
-
-        private string baseDirectory_;
-        private char replacementChar_ = '_';
-        private bool trimIncomingPaths_;
-
-        #endregion
 
         #region Class Fields
 
@@ -66,28 +58,7 @@ namespace TidyBackups.SharpZipLib.Zip
         #endregion
 
         /// <summary>
-        /// Initialise static class information.
-        /// </summary>
-        static WindowsNameTransform()
-        {
-            char[] invalidPathChars;
-
-#if NET_1_0 || NET_1_1 || NETCF_1_0
-			invalidPathChars = Path.InvalidPathChars;
-#else
-            invalidPathChars = Path.GetInvalidPathChars();
-#endif
-            int howMany = invalidPathChars.Length + 3;
-
-            InvalidEntryChars = new char[howMany];
-            Array.Copy(invalidPathChars, 0, InvalidEntryChars, 0, invalidPathChars.Length);
-            InvalidEntryChars[howMany - 1] = '*';
-            InvalidEntryChars[howMany - 2] = '?';
-            InvalidEntryChars[howMany - 2] = ':';
-        }
-
-        /// <summary>
-        /// Initialises a new instance of <see cref="WindowsNameTransform"/>
+        ///     Initialises a new instance of <see cref="WindowsNameTransform" />
         /// </summary>
         /// <param name="baseDirectory"></param>
         public WindowsNameTransform(string baseDirectory)
@@ -101,7 +72,7 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Initialise a default instance of <see cref="WindowsNameTransform"/>
+        ///     Initialise a default instance of <see cref="WindowsNameTransform" />
         /// </summary>
         public WindowsNameTransform()
         {
@@ -109,7 +80,28 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Gets or sets a value containing the target directory to prefix values with.
+        ///     Initialise static class information.
+        /// </summary>
+        static WindowsNameTransform()
+        {
+            char[] invalidPathChars;
+
+#if NET_1_0 || NET_1_1 || NETCF_1_0
+			invalidPathChars = Path.InvalidPathChars;
+#else
+            invalidPathChars = Path.GetInvalidPathChars();
+#endif
+            var howMany = invalidPathChars.Length + 3;
+
+            InvalidEntryChars = new char[howMany];
+            Array.Copy(invalidPathChars, 0, InvalidEntryChars, 0, invalidPathChars.Length);
+            InvalidEntryChars[howMany - 1] = '*';
+            InvalidEntryChars[howMany - 2] = '?';
+            InvalidEntryChars[howMany - 2] = ':';
+        }
+
+        /// <summary>
+        ///     Gets or sets a value containing the target directory to prefix values with.
         /// </summary>
         public string BaseDirectory
         {
@@ -126,23 +118,19 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Gets or sets a value indicating wether paths on incoming values should be removed.
+        ///     Gets or sets a value indicating wether paths on incoming values should be removed.
         /// </summary>
-        public bool TrimIncomingPaths
-        {
-            get { return trimIncomingPaths_; }
-            set { trimIncomingPaths_ = value; }
-        }
+        public bool TrimIncomingPaths { get; set; }
 
         /// <summary>
-        /// Gets or set the character to replace invalid characters during transformations.
+        ///     Gets or set the character to replace invalid characters during transformations.
         /// </summary>
         public char Replacement
         {
             get { return replacementChar_; }
             set
             {
-                for (int i = 0; i < InvalidEntryChars.Length; ++i)
+                for (var i = 0; i < InvalidEntryChars.Length; ++i)
                 {
                     if (InvalidEntryChars[i] == value)
                     {
@@ -159,71 +147,15 @@ namespace TidyBackups.SharpZipLib.Zip
             }
         }
 
-        #region INameTransform Members
-
         /// <summary>
-        /// Transform a Zip directory name to a windows directory name.
-        /// </summary>
-        /// <param name="name">The directory name to transform.</param>
-        /// <returns>The transformed name.</returns>
-        public string TransformDirectory(string name)
-        {
-            name = TransformFile(name);
-            if (name.Length > 0)
-            {
-                while (name.EndsWith(@"\"))
-                {
-                    name = name.Remove(name.Length - 1, 1);
-                }
-            }
-            else
-            {
-                throw new ZipException("Cannot have an empty directory name");
-            }
-            return name;
-        }
-
-        /// <summary>
-        /// Transform a Zip format file name to a windows style one.
-        /// </summary>
-        /// <param name="name">The file name to transform.</param>
-        /// <returns>The transformed name.</returns>
-        public string TransformFile(string name)
-        {
-            if (name != null)
-            {
-                name = MakeValidName(name, replacementChar_);
-
-                if (trimIncomingPaths_)
-                {
-                    name = Path.GetFileName(name);
-                }
-
-                // This may exceed windows length restrictions.
-                // Combine will throw a PathTooLongException in that case.
-                if (baseDirectory_ != null)
-                {
-                    name = Path.Combine(baseDirectory_, name);
-                }
-            }
-            else
-            {
-                name = string.Empty;
-            }
-            return name;
-        }
-
-        #endregion
-
-        /// <summary>
-        /// Test a name to see if it is a valid name for a windows filename as extracted from a Zip archive.
+        ///     Test a name to see if it is a valid name for a windows filename as extracted from a Zip archive.
         /// </summary>
         /// <param name="name">The name to test.</param>
         /// <returns>Returns true if the name is a valid zip name; false otherwise.</returns>
         /// <remarks>The filename isnt a true windows path in some fundamental ways like no absolute paths, no rooted paths etc.</remarks>
         public static bool IsValidName(string name)
         {
-            bool result =
+            var result =
                 (name != null) &&
                 (name.Length <= MaxPath) &&
                 (string.Compare(name, MakeValidName(name, '_')) == 0)
@@ -233,7 +165,7 @@ namespace TidyBackups.SharpZipLib.Zip
         }
 
         /// <summary>
-        /// Force a name to be valid by replacing invalid characters with a fixed value
+        ///     Force a name to be valid by replacing invalid characters with a fixed value
         /// </summary>
         /// <param name="name">The name to make valid</param>
         /// <param name="replacement">The replacement character to use for any invalid characters.</param>
@@ -260,7 +192,7 @@ namespace TidyBackups.SharpZipLib.Zip
             }
 
             // Convert consecutive \\ characters to \
-            int index = name.IndexOf(@"\\");
+            var index = name.IndexOf(@"\\");
             while (index >= 0)
             {
                 name = name.Remove(index, 1);
@@ -298,5 +230,68 @@ namespace TidyBackups.SharpZipLib.Zip
 
             return name;
         }
+
+        #region Instance Fields
+
+        private string baseDirectory_;
+        private char replacementChar_ = '_';
+
+        #endregion
+
+        #region INameTransform Members
+
+        /// <summary>
+        ///     Transform a Zip directory name to a windows directory name.
+        /// </summary>
+        /// <param name="name">The directory name to transform.</param>
+        /// <returns>The transformed name.</returns>
+        public string TransformDirectory(string name)
+        {
+            name = TransformFile(name);
+            if (name.Length > 0)
+            {
+                while (name.EndsWith(@"\"))
+                {
+                    name = name.Remove(name.Length - 1, 1);
+                }
+            }
+            else
+            {
+                throw new ZipException("Cannot have an empty directory name");
+            }
+            return name;
+        }
+
+        /// <summary>
+        ///     Transform a Zip format file name to a windows style one.
+        /// </summary>
+        /// <param name="name">The file name to transform.</param>
+        /// <returns>The transformed name.</returns>
+        public string TransformFile(string name)
+        {
+            if (name != null)
+            {
+                name = MakeValidName(name, replacementChar_);
+
+                if (TrimIncomingPaths)
+                {
+                    name = Path.GetFileName(name);
+                }
+
+                // This may exceed windows length restrictions.
+                // Combine will throw a PathTooLongException in that case.
+                if (baseDirectory_ != null)
+                {
+                    name = Path.Combine(baseDirectory_, name);
+                }
+            }
+            else
+            {
+                name = string.Empty;
+            }
+            return name;
+        }
+
+        #endregion
     }
 }

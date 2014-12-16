@@ -42,61 +42,20 @@ using System;
 namespace TidyBackups.SharpZipLib.Zip.Compression
 {
     /// <summary>
-    /// This class is general purpose class for writing data to a buffer.
-    /// 
-    /// It allows you to write bits as well as bytes
-    /// Based on DeflaterPending.java
-    /// 
-    /// author of the original java version : Jochen Hoenicke
+    ///     This class is general purpose class for writing data to a buffer.
+    ///     It allows you to write bits as well as bytes
+    ///     Based on DeflaterPending.java
+    ///     author of the original java version : Jochen Hoenicke
     /// </summary>
     public class PendingBuffer
     {
-        #region Instance Fields
-
         /// <summary>
-        /// Internal work buffer
+        ///     The number of bits written to the buffer
         /// </summary>
-        private readonly byte[] buffer_;
-
-        private int bitCount;
-        private uint bits;
-        private int end;
-        private int start;
-
-        #endregion
-
-        #region Constructors
+        public int BitCount { get; private set; }
 
         /// <summary>
-        /// construct instance using default buffer size of 4096
-        /// </summary>
-        public PendingBuffer() : this(4096)
-        {
-        }
-
-        /// <summary>
-        /// construct instance using specified buffer size
-        /// </summary>
-        /// <param name="bufferSize">
-        /// size to use for internal buffer
-        /// </param>
-        public PendingBuffer(int bufferSize)
-        {
-            buffer_ = new byte[bufferSize];
-        }
-
-        #endregion
-
-        /// <summary>
-        /// The number of bits written to the buffer
-        /// </summary>
-        public int BitCount
-        {
-            get { return bitCount; }
-        }
-
-        /// <summary>
-        /// Indicates if buffer has been flushed
+        ///     Indicates if buffer has been flushed
         /// </summary>
         public bool IsFlushed
         {
@@ -104,18 +63,18 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
         }
 
         /// <summary>
-        /// Clear internal state/buffers
+        ///     Clear internal state/buffers
         /// </summary>
         public void Reset()
         {
-            start = end = bitCount = 0;
+            start = end = BitCount = 0;
         }
 
         /// <summary>
-        /// Write a byte to buffer
+        ///     Write a byte to buffer
         /// </summary>
         /// <param name="value">
-        /// The value to write
+        ///     The value to write
         /// </param>
         public void WriteByte(int value)
         {
@@ -129,10 +88,10 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
         }
 
         /// <summary>
-        /// Write a short value to buffer LSB first
+        ///     Write a short value to buffer LSB first
         /// </summary>
         /// <param name="value">
-        /// The value to write.
+        ///     The value to write.
         /// </param>
         public void WriteShort(int value)
         {
@@ -147,7 +106,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
         }
 
         /// <summary>
-        /// write an integer LSB first
+        ///     write an integer LSB first
         /// </summary>
         /// <param name="value">The value to write.</param>
         public void WriteInt(int value)
@@ -165,7 +124,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
         }
 
         /// <summary>
-        /// Write a block of data to buffer
+        ///     Write a block of data to buffer
         /// </summary>
         /// <param name="block">data to write</param>
         /// <param name="offset">offset of first byte to write</param>
@@ -183,7 +142,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
         }
 
         /// <summary>
-        /// Align internal buffer on a byte boundary
+        ///     Align internal buffer on a byte boundary
         /// </summary>
         public void AlignToByte()
         {
@@ -193,20 +152,20 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
 				throw new SharpZipBaseException("Debug check: start != 0");
 			}
 #endif
-            if (bitCount > 0)
+            if (BitCount > 0)
             {
                 buffer_[end++] = unchecked((byte) bits);
-                if (bitCount > 8)
+                if (BitCount > 8)
                 {
                     buffer_[end++] = unchecked((byte) (bits >> 8));
                 }
             }
             bits = 0;
-            bitCount = 0;
+            BitCount = 0;
         }
 
         /// <summary>
-        /// Write bits to internal buffer
+        ///     Write bits to internal buffer
         /// </summary>
         /// <param name="b">source of bits</param>
         /// <param name="count">number of bits to write</param>
@@ -222,19 +181,19 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
             //				//Console.WriteLine("writeBits("+b+","+count+")");
             //			}
 #endif
-            bits |= (uint) (b << bitCount);
-            bitCount += count;
-            if (bitCount >= 16)
+            bits |= (uint) (b << BitCount);
+            BitCount += count;
+            if (BitCount >= 16)
             {
                 buffer_[end++] = unchecked((byte) bits);
                 buffer_[end++] = unchecked((byte) (bits >> 8));
                 bits >>= 16;
-                bitCount -= 16;
+                BitCount -= 16;
             }
         }
 
         /// <summary>
-        /// Write a short value to internal buffer most significant byte first
+        ///     Write a short value to internal buffer most significant byte first
         /// </summary>
         /// <param name="s">value to write</param>
         public void WriteShortMSB(int s)
@@ -250,8 +209,8 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
         }
 
         /// <summary>
-        /// Flushes the pending buffer into the given output array.  If the
-        /// output array is to small, only a partial flush is done.
+        ///     Flushes the pending buffer into the given output array.  If the
+        ///     output array is to small, only a partial flush is done.
         /// </summary>
         /// <param name="output">The output array.</param>
         /// <param name="offset">The offset into output array.</param>
@@ -259,11 +218,11 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
         /// <returns>The number of bytes flushed.</returns>
         public int Flush(byte[] output, int offset, int length)
         {
-            if (bitCount >= 8)
+            if (BitCount >= 8)
             {
                 buffer_[end++] = unchecked((byte) bits);
                 bits >>= 8;
-                bitCount -= 8;
+                BitCount -= 8;
             }
 
             if (length > end - start)
@@ -282,11 +241,11 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
         }
 
         /// <summary>
-        /// Convert internal buffer to byte array.
-        /// Buffer is empty on completion
+        ///     Convert internal buffer to byte array.
+        ///     Buffer is empty on completion
         /// </summary>
         /// <returns>
-        /// The internal buffer contents converted to a byte array.
+        ///     The internal buffer contents converted to a byte array.
         /// </returns>
         public byte[] ToByteArray()
         {
@@ -296,5 +255,40 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
             end = 0;
             return result;
         }
+
+        #region Instance Fields
+
+        /// <summary>
+        ///     Internal work buffer
+        /// </summary>
+        private readonly byte[] buffer_;
+
+        private uint bits;
+        private int end;
+        private int start;
+
+        #endregion
+
+        #region Constructors
+
+        /// <summary>
+        ///     construct instance using default buffer size of 4096
+        /// </summary>
+        public PendingBuffer() : this(4096)
+        {
+        }
+
+        /// <summary>
+        ///     construct instance using specified buffer size
+        /// </summary>
+        /// <param name="bufferSize">
+        ///     size to use for internal buffer
+        /// </param>
+        public PendingBuffer(int bufferSize)
+        {
+            buffer_ = new byte[bufferSize];
+        }
+
+        #endregion
     }
 }

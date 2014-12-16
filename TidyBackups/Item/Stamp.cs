@@ -21,12 +21,11 @@ using System.IO;
 namespace TidyBackups.Item
 {
     /// <summary>
-    /// 
     /// </summary>
     internal class Stamp
     {
         /// <summary>
-        /// Gets the file creation date.
+        ///     Gets the file creation date.
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
@@ -36,14 +35,14 @@ namespace TidyBackups.Item
         }
 
         /// <summary>
-        /// Sets the file creation date.
+        ///     Sets the file creation date.
         /// </summary>
         /// <param name="path"></param>
         /// <param name="date"></param>
         /// <returns></returns>
         protected internal static bool Set(string path, DateTime date)
         {
-            bool value = false;
+            var value = false;
             if (!Global.Debug)
             {
                 try

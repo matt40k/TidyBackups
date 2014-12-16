@@ -42,59 +42,70 @@ using System;
 namespace TidyBackups.SharpZipLib.Zip.Compression
 {
     /// <summary>
-    /// This is the DeflaterHuffman class.
-    /// 
-    /// This class is <i>not</i> thread safe.  This is inherent in the API, due
-    /// to the split of Deflate and SetInput.
-    /// 
-    /// author of the original java version : Jochen Hoenicke
+    ///     This is the DeflaterHuffman class.
+    ///     This class is <i>not</i> thread safe.  This is inherent in the API, due
+    ///     to the split of Deflate and SetInput.
+    ///     author of the original java version : Jochen Hoenicke
     /// </summary>
     public class DeflaterHuffman
     {
         private const int BUFSIZE = 1 << (DeflaterConstants.DEFAULT_MEM_LEVEL + 6);
         private const int LITERAL_NUM = 286;
-
         // Number of distance codes
         private const int DIST_NUM = 30;
         // Number of codes used to transfer bit lengths
         private const int BITLEN_NUM = 19;
-
         // repeat previous bit length 3-6 times (2 bits of repeat count)
         private const int REP_3_6 = 16;
         // repeat a zero length 3-10 times  (3 bits of repeat count)
         private const int REP_3_10 = 17;
         // repeat a zero length 11-138 times  (7 bits of repeat count)
         private const int REP_11_138 = 18;
-
         private const int EOF_SYMBOL = 256;
-
         // The lengths of the bit length codes are sent in order of decreasing
         // probability, to avoid transmitting the lengths for unused bit length codes.
         private static readonly int[] BL_ORDER = {16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15};
 
-        private static readonly byte[] bit4Reverse = {
-                                                         0,
-                                                         8,
-                                                         4,
-                                                         12,
-                                                         2,
-                                                         10,
-                                                         6,
-                                                         14,
-                                                         1,
-                                                         9,
-                                                         5,
-                                                         13,
-                                                         3,
-                                                         11,
-                                                         7,
-                                                         15
-                                                     };
+        private static readonly byte[] bit4Reverse =
+        {
+            0,
+            8,
+            4,
+            12,
+            2,
+            10,
+            6,
+            14,
+            1,
+            9,
+            5,
+            13,
+            3,
+            11,
+            7,
+            15
+        };
 
         private static readonly short[] staticLCodes;
         private static readonly byte[] staticLLength;
         private static readonly short[] staticDCodes;
         private static readonly byte[] staticDLength;
+
+        /// <summary>
+        ///     Construct instance with pending buffer
+        /// </summary>
+        /// <param name="pending">Pending buffer to use</param>
+        public DeflaterHuffman(DeflaterPending pending)
+        {
+            this.pending = pending;
+
+            literalTree = new Tree(this, LITERAL_NUM, 257, 15);
+            distTree = new Tree(this, DIST_NUM, 1, 15);
+            blTree = new Tree(this, BITLEN_NUM, 4, 7);
+
+            d_buf = new short[BUFSIZE];
+            l_buf = new byte[BUFSIZE];
+        }
 
         static DeflaterHuffman()
         {
@@ -103,7 +114,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
             staticLCodes = new short[LITERAL_NUM];
             staticLLength = new byte[LITERAL_NUM];
 
-            int i = 0;
+            var i = 0;
             while (i < 144)
             {
                 staticLCodes[i] = BitReverse((0x030 + i) << 8);
@@ -139,24 +150,8 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
         }
 
         /// <summary>
-        /// Construct instance with pending buffer
+        ///     Reset internal state
         /// </summary>
-        /// <param name="pending">Pending buffer to use</param>
-        public DeflaterHuffman(DeflaterPending pending)
-        {
-            this.pending = pending;
-
-            literalTree = new Tree(this, LITERAL_NUM, 257, 15);
-            distTree = new Tree(this, DIST_NUM, 1, 15);
-            blTree = new Tree(this, BITLEN_NUM, 4, 7);
-
-            d_buf = new short[BUFSIZE];
-            l_buf = new byte[BUFSIZE];
-        }
-
-        /// <summary>
-        /// Reset internal state
-        /// </summary>		
         public void Reset()
         {
             last_lit = 0;
@@ -167,7 +162,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
         }
 
         /// <summary>
-        /// Write all trees to pending buffer
+        ///     Write all trees to pending buffer
         /// </summary>
         /// <param name="blTreeCodes">The number/rank of treecodes to send.</param>
         public void SendAllTrees(int blTreeCodes)
@@ -178,7 +173,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
             pending.WriteBits(literalTree.numCodes - 257, 5);
             pending.WriteBits(distTree.numCodes - 1, 5);
             pending.WriteBits(blTreeCodes - 4, 4);
-            for (int rank = 0; rank < blTreeCodes; rank++)
+            for (var rank = 0; rank < blTreeCodes; rank++)
             {
                 pending.WriteBits(blTree.length[BL_ORDER[rank]], 3);
             }
@@ -193,13 +188,13 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
         }
 
         /// <summary>
-        /// Compress current buffer writing data to pending buffer
+        ///     Compress current buffer writing data to pending buffer
         /// </summary>
         public void CompressBlock()
         {
-            for (int i = 0; i < last_lit; i++)
+            for (var i = 0; i < last_lit; i++)
             {
-                int litlen = l_buf[i] & 0xff;
+                var litlen = l_buf[i] & 0xff;
                 int dist = d_buf[i];
                 if (dist-- != 0)
                 {
@@ -207,16 +202,16 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
                     //						Console.Write("["+(dist+1)+","+(litlen+3)+"]: ");
                     //					}
 
-                    int lc = Lcode(litlen);
+                    var lc = Lcode(litlen);
                     literalTree.WriteSymbol(lc);
 
-                    int bits = (lc - 261)/4;
+                    var bits = (lc - 261)/4;
                     if (bits > 0 && bits <= 5)
                     {
                         pending.WriteBits(litlen & ((1 << bits) - 1), bits);
                     }
 
-                    int dc = Dcode(dist);
+                    var dc = Dcode(dist);
                     distTree.WriteSymbol(dc);
 
                     bits = dc/2 - 1;
@@ -254,7 +249,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
         }
 
         /// <summary>
-        /// Flush block to output with no compression
+        ///     Flush block to output with no compression
         /// </summary>
         /// <param name="stored">Data to write</param>
         /// <param name="storedOffset">Index of first byte to write</param>
@@ -263,9 +258,9 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
         public void FlushStoredBlock(byte[] stored, int storedOffset, int storedLength, bool lastBlock)
         {
 #if DebugDeflation
-            //			if (DeflaterConstants.DEBUGGING) {
-            //				//Console.WriteLine("Flushing stored block "+ storedLength);
-            //			}
+    //			if (DeflaterConstants.DEBUGGING) {
+    //				//Console.WriteLine("Flushing stored block "+ storedLength);
+    //			}
 #endif
             pending.WriteBits((DeflaterConstants.STORED_BLOCK << 1) + (lastBlock ? 1 : 0), 3);
             pending.AlignToByte();
@@ -276,8 +271,8 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
         }
 
         /// <summary>
-        /// Flush block to output with compression
-        /// </summary>		
+        ///     Flush block to output with compression
+        /// </summary>
         /// <param name="stored">Data to flush</param>
         /// <param name="storedOffset">Index of first byte to flush</param>
         /// <param name="storedLength">Count of bytes to flush</param>
@@ -297,24 +292,24 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
             // Build bitlen tree
             blTree.BuildTree();
 
-            int blTreeCodes = 4;
-            for (int i = 18; i > blTreeCodes; i--)
+            var blTreeCodes = 4;
+            for (var i = 18; i > blTreeCodes; i--)
             {
                 if (blTree.length[BL_ORDER[i]] > 0)
                 {
                     blTreeCodes = i + 1;
                 }
             }
-            int opt_len = 14 + blTreeCodes*3 + blTree.GetEncodedLength() +
+            var opt_len = 14 + blTreeCodes*3 + blTree.GetEncodedLength() +
                           literalTree.GetEncodedLength() + distTree.GetEncodedLength() +
                           extra_bits;
 
-            int static_len = extra_bits;
-            for (int i = 0; i < LITERAL_NUM; i++)
+            var static_len = extra_bits;
+            for (var i = 0; i < LITERAL_NUM; i++)
             {
                 static_len += literalTree.freqs[i]*staticLLength[i];
             }
-            for (int i = 0; i < DIST_NUM; i++)
+            for (var i = 0; i < DIST_NUM; i++)
             {
                 static_len += distTree.freqs[i]*staticDLength[i];
             }
@@ -354,7 +349,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
         }
 
         /// <summary>
-        /// Get value indicating if internal buffer is full
+        ///     Get value indicating if internal buffer is full
         /// </summary>
         /// <returns>true if buffer is full</returns>
         public bool IsFull()
@@ -363,7 +358,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
         }
 
         /// <summary>
-        /// Add literal to buffer
+        ///     Add literal to buffer
         /// </summary>
         /// <param name="literal">Literal value to add to buffer.</param>
         /// <returns>Value indicating internal buffer is full</returns>
@@ -383,7 +378,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
         }
 
         /// <summary>
-        /// Add distance code and length to literal and distance trees
+        ///     Add distance code and length to literal and distance trees
         /// </summary>
         /// <param name="distance">Distance code</param>
         /// <param name="length">Length</param>
@@ -397,14 +392,14 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
             d_buf[last_lit] = (short) distance;
             l_buf[last_lit++] = (byte) (length - 3);
 
-            int lc = Lcode(length - 3);
+            var lc = Lcode(length - 3);
             literalTree.freqs[lc]++;
             if (lc >= 265 && lc < 285)
             {
                 extra_bits += (lc - 261)/4;
             }
 
-            int dc = Dcode(distance - 1);
+            var dc = Dcode(distance - 1);
             distTree.freqs[dc]++;
             if (dc >= 4)
             {
@@ -413,9 +408,8 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
             return IsFull();
         }
 
-
         /// <summary>
-        /// Reverse the bits of a 16 bit value.
+        ///     Reverse the bits of a 16 bit value.
         /// </summary>
         /// <param name="toReverse">Value to reverse bits</param>
         /// <returns>Value with bits reversed</returns>
@@ -434,7 +428,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
                 return 285;
             }
 
-            int code = 257;
+            var code = 257;
             while (length >= 8)
             {
                 code += 4;
@@ -445,7 +439,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
 
         private static int Dcode(int distance)
         {
-            int code = 0;
+            var code = 0;
             while (distance >= 4)
             {
                 code += 2;
@@ -458,21 +452,6 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
 
         private class Tree
         {
-            #region Instance Fields
-
-            private readonly int[] bl_counts;
-            private readonly DeflaterHuffman dh;
-            public readonly short[] freqs;
-            private readonly int maxLength;
-
-            public readonly int minNumCodes;
-
-            private short[] codes;
-            public byte[] length;
-            public int numCodes;
-
-            #endregion
-
             #region Constructors
 
             public Tree(DeflaterHuffman dh, int elems, int minCodes, int maxLength)
@@ -487,11 +466,11 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
             #endregion
 
             /// <summary>
-            /// Resets the internal state of the tree
+            ///     Resets the internal state of the tree
             /// </summary>
             public void Reset()
             {
-                for (int i = 0; i < freqs.Length; i++)
+                for (var i = 0; i < freqs.Length; i++)
                 {
                     freqs[i] = 0;
                 }
@@ -509,15 +488,15 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
             }
 
             /// <summary>
-            /// Check that all frequencies are zero
+            ///     Check that all frequencies are zero
             /// </summary>
             /// <exception cref="SharpZipBaseException">
-            /// At least one frequency is non-zero
+            ///     At least one frequency is non-zero
             /// </exception>
             public void CheckEmpty()
             {
-                bool empty = true;
-                for (int i = 0; i < freqs.Length; i++)
+                var empty = true;
+                for (var i = 0; i < freqs.Length; i++)
                 {
                     if (freqs[i] != 0)
                     {
@@ -533,7 +512,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
             }
 
             /// <summary>
-            /// Set static codes and length
+            ///     Set static codes and length
             /// </summary>
             /// <param name="staticCodes">new codes</param>
             /// <param name="staticLengths">length for new codes</param>
@@ -544,13 +523,13 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
             }
 
             /// <summary>
-            /// Build dynamic codes and lengths
+            ///     Build dynamic codes and lengths
             /// </summary>
             public void BuildCodes()
             {
-                int numSymbols = freqs.Length;
+                var numSymbols = freqs.Length;
                 var nextCode = new int[maxLength];
-                int code = 0;
+                var code = 0;
 
                 codes = new short[freqs.Length];
 
@@ -558,7 +537,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
                 //					//Console.WriteLine("buildCodes: "+freqs.Length);
                 //				}
 
-                for (int bits = 0; bits < maxLength; bits++)
+                for (var bits = 0; bits < maxLength; bits++)
                 {
                     nextCode[bits] = code;
                     code += bl_counts[bits] << (15 - bits);
@@ -575,7 +554,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
 					throw new SharpZipBaseException("Inconsistent bl_counts!");
 				}
 #endif
-                for (int i = 0; i < numCodes; i++)
+                for (var i = 0; i < numCodes; i++)
                 {
                     int bits = length[i];
                     if (bits > 0)
@@ -593,7 +572,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
 
             public void BuildTree()
             {
-                int numSymbols = freqs.Length;
+                var numSymbols = freqs.Length;
 
                 /* heap is a priority queue, sorted by frequency, least frequent
 				* nodes first.  The heap is a binary tree, with the property, that
@@ -604,15 +583,15 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
 				* the nodes 2*n+1, 2*n+2 are the child nodes of node n.
 				*/
                 var heap = new int[numSymbols];
-                int heapLen = 0;
-                int maxCode = 0;
-                for (int n = 0; n < numSymbols; n++)
+                var heapLen = 0;
+                var maxCode = 0;
+                for (var n = 0; n < numSymbols; n++)
                 {
                     int freq = freqs[n];
                     if (freq != 0)
                     {
                         // Insert n into heap
-                        int pos = heapLen++;
+                        var pos = heapLen++;
                         int ppos;
                         while (pos > 0 && freqs[heap[ppos = (pos - 1)/2]] > freq)
                         {
@@ -632,19 +611,19 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
 				*/
                 while (heapLen < 2)
                 {
-                    int node = maxCode < 2 ? ++maxCode : 0;
+                    var node = maxCode < 2 ? ++maxCode : 0;
                     heap[heapLen++] = node;
                 }
 
                 numCodes = Math.Max(maxCode + 1, minNumCodes);
 
-                int numLeafs = heapLen;
+                var numLeafs = heapLen;
                 var childs = new int[4*heapLen - 2];
                 var values = new int[2*heapLen - 1];
-                int numNodes = numLeafs;
-                for (int i = 0; i < heapLen; i++)
+                var numNodes = numLeafs;
+                for (var i = 0; i < heapLen; i++)
                 {
-                    int node = heap[i];
+                    var node = heap[i];
                     childs[2*i] = node;
                     childs[2*i + 1] = -1;
                     values[i] = freqs[node] << 8;
@@ -656,12 +635,12 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
 				*/
                 do
                 {
-                    int first = heap[0];
-                    int last = heap[--heapLen];
+                    var first = heap[0];
+                    var last = heap[--heapLen];
 
                     // Propagate the hole to the leafs of the heap
-                    int ppos = 0;
-                    int path = 1;
+                    var ppos = 0;
+                    var path = 1;
 
                     while (path < heapLen)
                     {
@@ -678,7 +657,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
                     /* Now propagate the last element down along path.  Normally
 					* it shouldn't go too deep.
 					*/
-                    int lastVal = values[last];
+                    var lastVal = values[last];
                     while ((path = ppos) > 0 && values[heap[ppos = (path - 1)/2]] > lastVal)
                     {
                         heap[path] = heap[ppos];
@@ -686,13 +665,13 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
                     heap[path] = last;
 
 
-                    int second = heap[0];
+                    var second = heap[0];
 
                     // Create a new node father of first and second
                     last = numNodes++;
                     childs[2*last] = first;
                     childs[2*last + 1] = second;
-                    int mindepth = Math.Min(values[first] & 0xff, values[second] & 0xff);
+                    var mindepth = Math.Min(values[first] & 0xff, values[second] & 0xff);
                     values[last] = lastVal = values[first] + values[second] - mindepth + 1;
 
                     // Again, propagate the hole to the leafs
@@ -728,13 +707,13 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
             }
 
             /// <summary>
-            /// Get encoded length
+            ///     Get encoded length
             /// </summary>
             /// <returns>Encoded length, the sum of frequencies * lengths</returns>
             public int GetEncodedLength()
             {
-                int len = 0;
-                for (int i = 0; i < freqs.Length; i++)
+                var len = 0;
+                for (var i = 0; i < freqs.Length; i++)
                 {
                     len += freqs[i]*length[i];
                 }
@@ -742,17 +721,17 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
             }
 
             /// <summary>
-            /// Scan a literal or distance tree to determine the frequencies of the codes
-            /// in the bit length tree.
+            ///     Scan a literal or distance tree to determine the frequencies of the codes
+            ///     in the bit length tree.
             /// </summary>
             public void CalcBLFreq(Tree blTree)
             {
                 int max_count; /* max repeat count */
                 int min_count; /* min repeat count */
                 int count; /* repeat count of the current code */
-                int curlen = -1; /* length of current code */
+                var curlen = -1; /* length of current code */
 
-                int i = 0;
+                var i = 0;
                 while (i < numCodes)
                 {
                     count = 1;
@@ -804,7 +783,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
             }
 
             /// <summary>
-            /// Write tree values
+            ///     Write tree values
             /// </summary>
             /// <param name="blTree">Tree to write</param>
             public void WriteTree(Tree blTree)
@@ -812,9 +791,9 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
                 int max_count; // max repeat count
                 int min_count; // min repeat count
                 int count; // repeat count of the current code
-                int curlen = -1; // length of current code
+                var curlen = -1; // length of current code
 
-                int i = 0;
+                var i = 0;
                 while (i < numCodes)
                 {
                     count = 1;
@@ -874,11 +853,11 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
             private void BuildLength(int[] childs)
             {
                 length = new byte[freqs.Length];
-                int numNodes = childs.Length/2;
-                int numLeafs = (numNodes + 1)/2;
-                int overflow = 0;
+                var numNodes = childs.Length/2;
+                var numLeafs = (numNodes + 1)/2;
+                var overflow = 0;
 
-                for (int i = 0; i < maxLength; i++)
+                for (var i = 0; i < maxLength; i++)
                 {
                     bl_counts[i] = 0;
                 }
@@ -887,11 +866,11 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
                 var lengths = new int[numNodes];
                 lengths[numNodes - 1] = 0;
 
-                for (int i = numNodes - 1; i >= 0; i--)
+                for (var i = numNodes - 1; i >= 0; i--)
                 {
                     if (childs[2*i + 1] != -1)
                     {
-                        int bitLength = lengths[i] + 1;
+                        var bitLength = lengths[i] + 1;
                         if (bitLength > maxLength)
                         {
                             bitLength = maxLength;
@@ -902,7 +881,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
                     else
                     {
                         // A leaf node
-                        int bitLength = lengths[i];
+                        var bitLength = lengths[i];
                         bl_counts[bitLength - 1]++;
                         length[childs[2*i]] = (byte) lengths[i];
                     }
@@ -921,7 +900,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
                     return;
                 }
 
-                int incrBitLen = maxLength - 1;
+                var incrBitLen = maxLength - 1;
                 do
                 {
                     // Find the first bit length which could increase:
@@ -952,13 +931,13 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
 				* The nodes were inserted with decreasing frequency into the childs
 				* array.
 				*/
-                int nodePtr = 2*numLeafs;
-                for (int bits = maxLength; bits != 0; bits--)
+                var nodePtr = 2*numLeafs;
+                for (var bits = maxLength; bits != 0; bits--)
                 {
-                    int n = bl_counts[bits - 1];
+                    var n = bl_counts[bits - 1];
                     while (n > 0)
                     {
-                        int childPtr = 2*childs[nodePtr++];
+                        var childPtr = 2*childs[nodePtr++];
                         if (childs[childPtr + 1] == -1)
                         {
                             // We found another leaf
@@ -975,6 +954,21 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
                 //					}
                 //				}
             }
+
+            #region Instance Fields
+
+            private readonly int[] bl_counts;
+            private readonly DeflaterHuffman dh;
+            public readonly short[] freqs;
+            private readonly int maxLength;
+
+            public readonly int minNumCodes;
+
+            private short[] codes;
+            public byte[] length;
+            public int numCodes;
+
+            #endregion
         }
 
         #endregion
@@ -992,7 +986,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
         private int last_lit;
 
         /// <summary>
-        /// Pending buffer to use
+        ///     Pending buffer to use
         /// </summary>
         public DeflaterPending pending;
 

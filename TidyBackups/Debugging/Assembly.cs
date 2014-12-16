@@ -24,20 +24,19 @@ namespace TidyBackups.Debug
     {
         protected internal static string Version
         {
-            get
-            {
-                return ((object)System.Reflection.Assembly.GetExecutingAssembly().GetName().Version).ToString();
-            }
+            get { return System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(); }
         }
 
         protected internal static string Title
         {
             get
             {
-                object[] customAttributes = System.Reflection.Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyTitleAttribute), false);
+                var customAttributes =
+                    System.Reflection.Assembly.GetExecutingAssembly()
+                        .GetCustomAttributes(typeof (AssemblyTitleAttribute), false);
                 if (customAttributes.Length > 0)
                 {
-                    AssemblyTitleAttribute assemblyTitleAttribute = (AssemblyTitleAttribute)customAttributes[0];
+                    var assemblyTitleAttribute = (AssemblyTitleAttribute) customAttributes[0];
                     if (assemblyTitleAttribute.Title != "")
                         return assemblyTitleAttribute.Title;
                 }
