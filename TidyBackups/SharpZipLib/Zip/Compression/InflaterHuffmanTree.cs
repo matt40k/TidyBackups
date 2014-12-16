@@ -136,7 +136,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
 
             var code = 0;
             var treeSize = 512;
-            for (var bits = 1; bits <= MAX_BITLEN; bits++)
+            for (int bits = 1; bits <= MAX_BITLEN; bits++)
             {
                 nextCode[bits] = code;
                 code += blCount[bits] << (16 - bits);
@@ -160,7 +160,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
 			*/
             tree = new short[treeSize];
             var treePtr = 512;
-            for (var bits = MAX_BITLEN; bits >= 10; bits--)
+            for (int bits = MAX_BITLEN; bits >= 10; bits--)
             {
                 var end = code & 0x1ff80;
                 code -= blCount[bits] << (16 - bits);
@@ -216,7 +216,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
         /// </returns>
         public int GetSymbol(StreamManipulator input)
         {
-            int lookahead, symbol;
+            int lookahead, symbol, bits;
             if ((lookahead = input.PeekBits(9)) >= 0)
             {
                 if ((symbol = tree[lookahead]) >= 0)
@@ -232,7 +232,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
                     input.DropBits(symbol & 15);
                     return symbol >> 4;
                 }
-                var bits = input.AvailableBits;
+                bits = input.AvailableBits;
                 lookahead = input.PeekBits(bits);
                 symbol = tree[subtree | (lookahead >> 9)];
                 if ((symbol & 15) <= bits)
@@ -242,7 +242,7 @@ namespace TidyBackups.SharpZipLib.Zip.Compression
                 }
                 return -1;
             }
-            var bits = input.AvailableBits;
+            bits = input.AvailableBits;
             lookahead = input.PeekBits(bits);
             symbol = tree[lookahead];
             if (symbol >= 0 && (symbol & 15) <= bits)
