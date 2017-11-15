@@ -1,91 +1,31 @@
-/*
- * This file is part of TidyBackups
- *
- * TidyBackups is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * TidyBackups is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public License
- * along with TidyBackups.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-using System;
-using System.IO;
-using TidyBackups.Item;
-using TidyBackups.SharpZipLib.Zip;
-
-namespace TidyBackups
+﻿namespace TidyBackups
 {
-    /// <summary>
-    ///     Class for the Compression logic
-    /// </summary>
-    internal class Compress
+    using System;
+    using System.Collections;
+    using System.IO;
+    using ICSharpCode.SharpZipLib;
+    using ICSharpCode.SharpZipLib.Zip;
+
+    public class Compress
     {
-        protected internal static void Archive(string path, bool safe)
+        private Logger _logger;
+
+        private string _password;
+
+        public Compress(Logger logger, string password)
         {
-            var files = Directory.GetFiles(path);
-            foreach (var file in files)
-            {
-                if (Name.ToCompress(file))
-                {
-                    CompressZip(file, safe);
-                }
-            }
+            this._logger = logger;
+            this._password = password;
         }
 
         /// <summary>
-        ///     Runs logic for creating zip, it'll do a bit of last min checking first.
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="safe"></param>
-        protected internal static void CompressZip(string path, bool safe)
-        {
-            var dir = Name.GetDir(path);
-            var nam = Name.GetName(path);
-            var ext = Name.GetExt(path);
-            var created = Stamp.Get(path);
-            var name = path.Replace(ext, ".zip");
-            if (!File.Exists(name))
-            {
-                Write(name, dir, nam);
-                Stamp.Set(name, created);
-                Message.Print("  COMPRESSED: " + path);
-                Rename.Delete(path);
-            }
-            else
-            {
-                if (Read(name, path, safe))
-                {
-                    Rename.Delete(path);
-                }
-                else
-                {
-                    // If the compressed file is not corrupt. We'll give it a new name, based on the time. 
-                    var dt = String.Format("_{0:yyyy-MM-dd_hh-mm-ss}.zip", DateTime.Now);
-                    var newname = path.Replace(ext, dt);
-                    Write(newname, dir, nam);
-                    Stamp.Set(newname, created);
-                    Message.Print("  COMPRESSED " + path);
-                    Message.Print("    AS - " + newname);
-                    Rename.Delete(path);
-                }
-            }
-        }
-
-        /// <summary>
-        ///     Checks zip is able to be opened and valid.
+        /// Check we can actually open the zip
         /// </summary>
         /// <param name="path"></param>
         /// <param name="name"></param>
         /// <param name="safe"></param>
         /// <returns></returns>
-        protected internal static bool Read(string path, string name, bool safe)
+        public bool IsReadableZip(string path, string name, bool safe)
         {
             var value = false;
             try
@@ -97,18 +37,11 @@ namespace TidyBackups
                     {
                         if (name != null)
                         {
-#if MS_TEST
-                            Message.print(theEntry.Name);
-                            Message.print(File.Name.GetUncompress(path));
-#endif
-                            if (theEntry.Name == Name.GetUncompress(path))
+                            if (Path.GetFileNameWithoutExtension(theEntry.Name)
+                                == Path.GetFileNameWithoutExtension(path))
                             {
                                 // Checks (uncompressed) file size is the same
-#if MS_TEST
-                                Message.print(theEntry.Size.ToString());
-                                Message.print(File.Size.get(name).ToString());
-#endif
-                                if (theEntry.Size == Size.Get(name))
+                                if (theEntry.Size == new FileInfo(name).Length)
                                 {
                                     value = true;
                                 }
@@ -121,34 +54,67 @@ namespace TidyBackups
             }
             catch (Exception)
             {
-                Message.Print("  CORRUPT: " + path);
+                this._logger.Output("  CORRUPT: " + path, Logger.LogLevel.Info);
                 if (!safe)
                 {
-                    Rename.Delete(path);
+                    string result = Common.Remove(path);
+                    if (result.ToUpper().StartsWith("ERROR"))
+                    {
+                        this._logger.Output(result, Logger.LogLevel.Error);
+                    }
+                    else
+                    {
+                        this._logger.Output(result, Logger.LogLevel.Info);
+                    }
                 }
             }
             return value;
         }
 
-        /// <summary>
-        ///     Creates the zip
-        /// </summary>
-        /// <param name="filename"></param>
-        /// <param name="dir"></param>
-        /// <param name="file"></param>
-        private static void Write(string filename, string dir, string file)
+        private void CreateZip(string filePath, string password)
         {
-            if (!Global.Debug)
+            var dir = Path.GetDirectoryName(filePath);
+            var nam = Path.GetFileName(filePath);
+            var ext = Path.GetExtension(filePath);
+            var created = File.GetCreationTime(filePath);
+            var name = filePath.Replace(ext, ".zip");
+
+            if (!File.Exists(name))
             {
-                try
+                Zip(name, dir, nam, password);
+                File.SetCreationTime(name, created);
+                this._logger.Output("  COMPRESSED: " + filePath, Logger.LogLevel.Info);
+                Common.Remove(filePath);
+            }
+            else
+            {
+                var dt = string.Format("_{0:yyyy-MM-dd_hh-mm-ss}.zip", DateTime.Now);
+                var newname = filePath.Replace(ext, dt);
+                Zip(newname, dir, nam, password);
+                File.SetCreationTime(newname, created);
+                this._logger.Output("  COMPRESSED " + filePath, Logger.LogLevel.Info);
+                this._logger.Output("    AS - " + newname, Logger.LogLevel.Info);
+                Common.Remove(filePath);
+            }
+        }
+
+        private void Zip(string filename, string dir, string file, string password)
+        {
+            var zip2 = new FastZip();
+            if (!string.IsNullOrWhiteSpace(password))
+            {
+                zip2.Password = password;
+            }
+            zip2.CreateZip(filename, dir, false, file);
+        }
+
+        public void Archive(ArrayList fileList, bool safe)
+        {
+            foreach (string filePath in fileList)
+            {
+                if (Common.ToCompress(filePath))
                 {
-                    var zip2 = new FastZip();
-                    zip2.CreateZip(filename, dir, false, file);
-                }
-                catch (ZipException)
-                {
-                    // Error
-                    Message.Print("compression error");
+                    CreateZip(filePath, this._password);
                 }
             }
         }
